@@ -3,7 +3,8 @@ import styled from "styled-components";
 import { useForm } from "react-hook-form";
 import { Input } from "~/components/input";
 import { Label } from "~/components/label";
-import { IconEyeOpen } from "~/components/icon";
+import { IconEyeClose, IconEyeOpen } from "~/components/icon";
+import { Field } from "~/components/field";
 
 const SignUpPageStyles = styled.div`
     min-height: 100vh;
@@ -19,13 +20,6 @@ const SignUpPageStyles = styled.div`
         font-weight: bold;
         font-size: 4rem;
         margin-bottom: 60px;
-    }
-
-    .field {
-        display: flex;
-        flex-direction: column;
-        row-gap: 20px;
-        align-items: flex-start;
     }
 
     .form {
@@ -55,16 +49,35 @@ const SignUpPage = () => {
                 />
                 <h1 className="heading">Monkey Blogging</h1>
                 <form className="form" onSubmit={handleSubmit(hanleSignUp)}>
-                    <div className="field">
+                    <Field>
                         <Label htmlFor="fullname">Fullname</Label>
-
                         <Input
                             control={control}
                             type="text"
                             name="fullname"
                             placeholder="Enter your fullname"
                         />
-                    </div>
+                    </Field>
+                    <Field>
+                        <Label htmlFor="email">Email address</Label>
+                        <Input
+                            control={control}
+                            type="email"
+                            name="email"
+                            placeholder="Enter your email"
+                        />
+                    </Field>
+                    <Field>
+                        <Label htmlFor="password">Password</Label>
+                        <Input
+                            control={control}
+                            type="password"
+                            name="password"
+                            placeholder="Enter your password"
+                        >
+                            <IconEyeClose className="input-icon"></IconEyeClose>
+                        </Input>
+                    </Field>
                 </form>
             </div>
         </SignUpPageStyles>
