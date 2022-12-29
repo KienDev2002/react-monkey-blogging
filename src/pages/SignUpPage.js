@@ -11,6 +11,11 @@ import { toast } from "react-toastify";
 import { Field } from "~/components/field";
 import { useState } from "react";
 import { Button } from "~/components/button";
+import { async } from "@firebase/util";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth, db } from "~/components/firebase/firebase-config";
+import { useNavigate } from "react-router-dom";
+import { addDoc, collection } from "firebase/firestore";
 const SignUpPageStyles = styled.div`
     min-height: 100vh;
     padding: 40px;
@@ -46,6 +51,7 @@ const schema = yup.object({
 });
 
 const SignUpPage = () => {
+    const navigate = useNavigate();
     const {
         control,
         handleSubmit,
@@ -54,13 +60,24 @@ const SignUpPage = () => {
         reset,
     } = useForm({ mode: "onChange", resolver: yupResolver(schema) });
 
-    const hanleSignUp = (values) => {
+    const hanleSignUp = async (values) => {
         if (!isValid) return;
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve();
-            }, 5000);
+        const user = await createUserWithEmailAndPassword(
+            auth,
+            values.email,
+            values.password
+        );
+        updateProfile(auth.currentUser, {
+            displayName: values.fullname,
         });
+        const colRef = collection(db, "users");
+        await addDoc(colRef, {
+            fullname: values.fullname,
+            email: values.email,
+            password: values.password,
+        });
+        toast.success("Register successfully");
+        navigate("/");
     };
     const [togglePassword, setTogglePassword] = useState(false);
     useEffect(() => {
