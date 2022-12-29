@@ -16,6 +16,7 @@ import { auth, db } from "~/components/firebase/firebase-config";
 import { useNavigate } from "react-router-dom";
 import { addDoc, collection } from "firebase/firestore";
 import AuthenticationPage from "./AuthenticationPage";
+import { useAuth } from "~/contexts/auth-context";
 
 const schema = yup.object({
     fullname: yup.string().required("please enter your fullname"),
@@ -68,6 +69,10 @@ const SignUpPage = () => {
             });
         }
     }, [errors]);
+
+    useEffect(() => {
+        document.title = "Register Page";
+    }, []);
     return (
         <AuthenticationPage>
             <form className="form" onSubmit={handleSubmit(hanleSignUp)}>

@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { toast } from "react-toastify";
 import { Button } from "~/components/button";
 import { Field } from "~/components/field";
 import { IconEyeClose, IconEyeOpen } from "~/components/icon";
@@ -9,27 +12,53 @@ import { Input } from "~/components/input";
 import { Label } from "~/components/label";
 import { useAuth } from "~/contexts/auth-context";
 import AuthenticationPage from "./AuthenticationPage";
+import { signInAnonymously, signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "~/components/firebase/firebase-config";
 
+const schema = yup.object({
+    email: yup
+        .string()
+        .email("please enter valid email address")
+        .required("please enter your email address"),
+    password: yup
+        .string()
+        .required("please enter your password")
+        .min(8, "Your password must be at least 8 characters or greater"),
+});
 const SignInPage = () => {
+    const navigate = useNavigate();
     const {
         handleSubmit,
         control,
         formState: { isValid, errors, isSubmitting },
     } = useForm({
         mode: "onChange",
+        resolver: yupResolver(schema),
     });
-    // const { useInfo } = useAuth();
-    // const navigate = useNavigate();
-    // useEffect(() => {
-    //     if (!useInfo?.email) {
-    //         navigate("/sign-up");
-    //     } else {
-    //         navigate("/");
-    //     }
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, []);
+
     const [togglePassword, setTogglePassword] = useState(false);
-    const hanleSignIn = (values) => {};
+    const hanleSignIn = async (values) => {
+        if (!isValid) return;
+        await signInWithEmailAndPassword(auth, values.email, values.password);
+        navigate("/");
+    };
+    useEffect(() => {
+        const arrError = Object.values(errors);
+        if (arrError.length > 0) {
+            toast.error(arrError[0]?.message, {
+                pauseOnHover: false,
+                delay: 0,
+            });
+        }
+    }, [errors]);
+    const { userInfo } = useAuth();
+    useEffect(() => {
+        document.title = "Login Page";
+        if (userInfo.email) {
+            navigate("/");
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <AuthenticationPage>
