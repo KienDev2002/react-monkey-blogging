@@ -4,10 +4,13 @@ import { useForm } from "react-hook-form";
 import { Input } from "~/components/input";
 import { Label } from "~/components/label";
 import { IconEyeClose, IconEyeOpen } from "~/components/icon";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
 import { Field } from "~/components/field";
 import { useState } from "react";
 import { Button } from "~/components/button";
-
 const SignUpPageStyles = styled.div`
     min-height: 100vh;
     padding: 40px;
@@ -30,6 +33,18 @@ const SignUpPageStyles = styled.div`
     }
 `;
 
+const schema = yup.object({
+    fullname: yup.string().required("please enter your fullname"),
+    email: yup
+        .string()
+        .email("please enter valid email address")
+        .required("please enter your email address"),
+    password: yup
+        .string()
+        .required("please enter your password")
+        .min(8, "Your password must be at least 8 characters or greater"),
+});
+
 const SignUpPage = () => {
     const {
         control,
@@ -37,7 +52,7 @@ const SignUpPage = () => {
         formState: { errors, isValid, isSubmitting },
         watch,
         reset,
-    } = useForm({ mode: "onchange" });
+    } = useForm({ mode: "onChange", resolver: yupResolver(schema) });
 
     const hanleSignUp = (values) => {
         if (!isValid) return;
@@ -48,6 +63,15 @@ const SignUpPage = () => {
         });
     };
     const [togglePassword, setTogglePassword] = useState(false);
+    useEffect(() => {
+        const arrError = Object.values(errors);
+        if (arrError.length > 0) {
+            toast.error(arrError[0]?.message, {
+                pauseOnHover: false,
+                delay: 0,
+            });
+        }
+    }, [errors]);
     return (
         <SignUpPageStyles>
             <div className="container">
