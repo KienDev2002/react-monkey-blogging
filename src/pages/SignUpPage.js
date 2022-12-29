@@ -11,32 +11,11 @@ import { toast } from "react-toastify";
 import { Field } from "~/components/field";
 import { useState } from "react";
 import { Button } from "~/components/button";
-import { async } from "@firebase/util";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth, db } from "~/components/firebase/firebase-config";
 import { useNavigate } from "react-router-dom";
 import { addDoc, collection } from "firebase/firestore";
-const SignUpPageStyles = styled.div`
-    min-height: 100vh;
-    padding: 40px;
-
-    .logo {
-        margin: 0 auto 20px;
-    }
-
-    .heading {
-        text-align: center;
-        color: ${(props) => props.theme.primary};
-        font-weight: bold;
-        font-size: 4rem;
-        margin-bottom: 60px;
-    }
-
-    .form {
-        max-width: 600px;
-        margin: 0 auto;
-    }
-`;
+import AuthenticationPage from "./AuthenticationPage";
 
 const schema = yup.object({
     fullname: yup.string().required("please enter your fullname"),
@@ -90,63 +69,55 @@ const SignUpPage = () => {
         }
     }, [errors]);
     return (
-        <SignUpPageStyles>
-            <div className="container">
-                <img
-                    className="logo"
-                    srcSet="/logo.png 2x"
-                    alt="monkey-blogging"
-                />
-                <h1 className="heading">Monkey Blogging</h1>
-                <form className="form" onSubmit={handleSubmit(hanleSignUp)}>
-                    <Field>
-                        <Label htmlFor="fullname">Fullname</Label>
-                        <Input
-                            control={control}
-                            type="text"
-                            name="fullname"
-                            placeholder="Enter your fullname"
-                        />
-                    </Field>
-                    <Field>
-                        <Label htmlFor="email">Email address</Label>
-                        <Input
-                            control={control}
-                            type="email"
-                            name="email"
-                            placeholder="Enter your email"
-                        />
-                    </Field>
-                    <Field>
-                        <Label htmlFor="password">Password</Label>
-                        <Input
-                            control={control}
-                            type={togglePassword ? "text" : "password"}
-                            name="password"
-                            placeholder="Enter your password"
-                        >
-                            {!togglePassword ? (
-                                <IconEyeClose
-                                    onClick={() => setTogglePassword(true)}
-                                ></IconEyeClose>
-                            ) : (
-                                <IconEyeOpen
-                                    onClick={() => setTogglePassword(false)}
-                                ></IconEyeOpen>
-                            )}
-                        </Input>
-                    </Field>
-                    <Button
-                        isLoading={isSubmitting}
-                        disabled={isSubmitting}
-                        type="submit"
-                        style={{ maxWidth: 350, margin: "0 auto" }}
+        <AuthenticationPage>
+            <form className="form" onSubmit={handleSubmit(hanleSignUp)}>
+                <Field>
+                    <Label htmlFor="fullname">Fullname</Label>
+                    <Input
+                        control={control}
+                        type="text"
+                        name="fullname"
+                        placeholder="Enter your fullname"
+                    />
+                </Field>
+                <Field>
+                    <Label htmlFor="email">Email address</Label>
+                    <Input
+                        control={control}
+                        type="email"
+                        name="email"
+                        placeholder="Enter your email"
+                    />
+                </Field>
+                <Field>
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                        control={control}
+                        type={togglePassword ? "text" : "password"}
+                        name="password"
+                        placeholder="Enter your password"
                     >
-                        Sign up
-                    </Button>
-                </form>
-            </div>
-        </SignUpPageStyles>
+                        {!togglePassword ? (
+                            <IconEyeClose
+                                onClick={() => setTogglePassword(true)}
+                            ></IconEyeClose>
+                        ) : (
+                            <IconEyeOpen
+                                onClick={() => setTogglePassword(false)}
+                            ></IconEyeOpen>
+                        )}
+                    </Input>
+                </Field>
+                <Button
+                    isLoading={isSubmitting}
+                    disabled={isSubmitting}
+                    type="submit"
+                    style={{ maxWidth: 350, margin: "0 auto" }}
+                >
+                    Sign up
+                </Button>
+            </form>
+        </AuthenticationPage>
     );
 };
 
