@@ -1,6 +1,7 @@
 import React from "react";
 import { useController } from "react-hook-form";
 import styled from "styled-components";
+import PropTypes from "prop-types";
 
 const InputStyles = styled.div`
     position: relative;
@@ -46,6 +47,12 @@ const Input = ({ name = "", type = "", children, control, ...props }) => {
             {children ? <div className="input-icon">{children}</div> : null}
         </InputStyles>
     );
+};
+
+Input.propsTypes = {
+    type: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    children: PropTypes.node,
 };
 
 export default Input;
