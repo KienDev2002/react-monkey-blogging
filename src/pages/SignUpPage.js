@@ -6,6 +6,7 @@ import { Label } from "~/components/label";
 import { IconEyeClose, IconEyeOpen } from "~/components/icon";
 import { Field } from "~/components/field";
 import { useState } from "react";
+import { Button } from "~/components/button";
 
 const SignUpPageStyles = styled.div`
     min-height: 100vh;
@@ -35,10 +36,16 @@ const SignUpPage = () => {
         handleSubmit,
         formState: { errors, isValid, isSubmitting },
         watch,
-    } = useForm();
+        reset,
+    } = useForm({ mode: "onchange" });
 
     const hanleSignUp = (values) => {
-        console.log(values);
+        if (!isValid) return;
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve();
+            }, 5000);
+        });
     };
     const [togglePassword, setTogglePassword] = useState(false);
     return (
@@ -88,6 +95,14 @@ const SignUpPage = () => {
                             )}
                         </Input>
                     </Field>
+                    <Button
+                        isLoading={isSubmitting}
+                        disabled={isSubmitting}
+                        type="submit"
+                        style={{ maxWidth: 350, margin: "0 auto" }}
+                    >
+                        Sign up
+                    </Button>
                 </form>
             </div>
         </SignUpPageStyles>
