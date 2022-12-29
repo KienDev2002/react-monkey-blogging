@@ -21,6 +21,15 @@ const AuthenticationPageStyles = styled.div`
         max-width: 600px;
         margin: 0 auto;
     }
+
+    .have-account {
+        margin-bottom: 20px;
+        a {
+            display: inline-block;
+            color: ${(props) => props.theme.primary};
+            font-weight: 500;
+        }
+    }
 `;
 
 const AuthenticationPage = ({ children }) => {

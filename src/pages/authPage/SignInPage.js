@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "react-toastify";
@@ -54,7 +54,7 @@ const SignInPage = () => {
     const { userInfo } = useAuth();
     useEffect(() => {
         document.title = "Login Page";
-        if (userInfo.email) {
+        if (userInfo?.email) {
             navigate("/");
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -91,6 +91,10 @@ const SignInPage = () => {
                         )}
                     </Input>
                 </Field>
+                <div className="have-account">
+                    Haven't you already had an account?
+                    <NavLink to={"/sign-up"}> Register an account</NavLink>
+                </div>
                 <Button
                     isLoading={isSubmitting}
                     disabled={isSubmitting}

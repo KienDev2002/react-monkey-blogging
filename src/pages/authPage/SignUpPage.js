@@ -13,7 +13,7 @@ import { useState } from "react";
 import { Button } from "~/components/button";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth, db } from "~/components/firebase/firebase-config";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { addDoc, collection } from "firebase/firestore";
 import AuthenticationPage from "./AuthenticationPage";
 import { useAuth } from "~/contexts/auth-context";
@@ -113,6 +113,11 @@ const SignUpPage = () => {
                         )}
                     </Input>
                 </Field>
+
+                <div className="have-account">
+                    Have you already had an account?
+                    <NavLink to={"/sign-in"}> Login</NavLink>
+                </div>
                 <Button
                     isLoading={isSubmitting}
                     disabled={isSubmitting}
