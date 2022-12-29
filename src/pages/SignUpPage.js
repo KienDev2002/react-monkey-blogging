@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { useForm } from "react-hook-form";
 import { Input } from "~/components/input";
 import { Label } from "~/components/label";
+import { IconEyeOpen } from "~/components/icon";
 
 const SignUpPageStyles = styled.div`
     min-height: 100vh;
@@ -62,8 +63,7 @@ const SignUpPage = () => {
                             type="text"
                             name="fullname"
                             placeholder="Enter your fullname"
-                            hasIcon
-                        ></Input>
+                        />
                     </div>
                 </form>
             </div>
