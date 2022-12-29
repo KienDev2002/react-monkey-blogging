@@ -1,5 +1,7 @@
 import React from "react";
 import styled from "styled-components";
+import { useForm } from "react-hook-form";
+import { Input } from "~/components/input";
 import { Label } from "~/components/label";
 
 const SignUpPageStyles = styled.div`
@@ -25,25 +27,6 @@ const SignUpPageStyles = styled.div`
         align-items: flex-start;
     }
 
-    .input {
-        width: 100%;
-        padding: 20px;
-        background-color: ${(props) => props.theme.grayLight};
-        border-radius: 8px;
-        font-weight: 500;
-        transition: all 0.2s linear;
-        border: 1px solid transparent;
-    }
-
-    .input:focus {
-        background-color: #fff;
-        border-color: ${(props) => props.theme.primary};
-    }
-
-    .input::placeholder {
-        color: #84878b;
-    }
-
     .form {
         max-width: 600px;
         margin: 0 auto;
@@ -51,6 +34,16 @@ const SignUpPageStyles = styled.div`
 `;
 
 const SignUpPage = () => {
+    const {
+        control,
+        handleSubmit,
+        formState: { errors, isValid, isSubmitting },
+        watch,
+    } = useForm();
+
+    const hanleSignUp = (values) => {
+        console.log(values);
+    };
     return (
         <SignUpPageStyles>
             <div className="container">
@@ -60,15 +53,17 @@ const SignUpPage = () => {
                     alt="monkey-blogging"
                 />
                 <h1 className="heading">Monkey Blogging</h1>
-                <form className="form">
+                <form className="form" onSubmit={handleSubmit(hanleSignUp)}>
                     <div className="field">
                         <Label htmlFor="fullname">Fullname</Label>
-                        <input
+
+                        <Input
+                            control={control}
                             type="text"
-                            className="input"
-                            id="fullname"
+                            name="fullname"
                             placeholder="Enter your fullname"
-                        />
+                            hasIcon
+                        ></Input>
                     </div>
                 </form>
             </div>
