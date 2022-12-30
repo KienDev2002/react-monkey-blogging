@@ -3,6 +3,7 @@ import { AuthProvider } from "./contexts/auth-context";
 import SignInPage from "./pages/authPage/SignInPage";
 import SignUpPage from "./pages/authPage/SignUpPage";
 import HomePage from "./pages/HomePage";
+import NotFoundPage from "./pages/NotFoundPage";
 function App() {
     return (
         <AuthProvider>
@@ -16,6 +17,7 @@ function App() {
                     path="/sign-in"
                     element={<SignInPage></SignInPage>}
                 ></Route>
+                <Route path="*" element={<NotFoundPage></NotFoundPage>}></Route>
             </Routes>
         </AuthProvider>
     );

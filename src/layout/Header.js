@@ -1,18 +1,19 @@
 import React from "react";
+import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 import { Button } from "~/components/button";
 
 const menuLinks = [
     {
-        url: "/#",
+        url: "/",
         title: "Home",
     },
     {
-        url: "/#",
+        url: "/blog",
         title: "Blog",
     },
     {
-        url: "/#",
+        url: "/contact",
         title: "Contact",
     },
 ];
@@ -34,12 +35,13 @@ const HeaderStyles = styled.header`
         gap: 20px;
         margin-left: 40px;
         list-style: none;
+        font-weight: 500;
     }
 
     .search {
         position: relative;
         padding: 15px 25px;
-        border: 1px solid #eee;
+        border: 1px solid #ccc;
         border-radius: 8px;
         width: 100%;
         max-width: 320px;
@@ -51,6 +53,7 @@ const HeaderStyles = styled.header`
     .search-input {
         flex: 1;
         padding-right: 45px;
+        font-weight: 500;
     }
     .search-icon {
         position: absolute;
@@ -68,19 +71,19 @@ const Header = () => {
         <HeaderStyles>
             <div className="container">
                 <div className="header-main">
-                    <a href="/">
+                    <NavLink to={"/"} href="/">
                         <img
                             className="logo"
                             srcSet="/logo.png 2x"
                             alt="Monkey blogging"
                         />
-                    </a>
+                    </NavLink>
                     <ul className="menu">
                         {menuLinks.map((item) => (
                             <li className="menu-item" key={item.title}>
-                                <a href={item.url} className="menu-link">
+                                <NavLink to={item.url} className="menu-link">
                                     {item.title}
-                                </a>
+                                </NavLink>
                             </li>
                         ))}
                     </ul>
@@ -124,8 +127,9 @@ const Header = () => {
                     </div>
 
                     <Button
-                        style={{ maxWidth: "200px" }}
                         className="header-button"
+                        height="56px"
+                        to="/sign-up"
                     >
                         Sign Up
                     </Button>
