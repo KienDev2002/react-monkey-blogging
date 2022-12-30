@@ -2,6 +2,7 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 import { Button } from "~/components/button";
+import { useAuth } from "~/contexts/auth-context";
 
 const menuLinks = [
     {
@@ -48,6 +49,7 @@ const HeaderStyles = styled.header`
         margin-left: auto;
         display: flex;
         align-items: center;
+        margin-right: 20px;
     }
 
     .search-input {
@@ -66,7 +68,13 @@ const HeaderStyles = styled.header`
     }
 `;
 
+function getLastName(name = "") {
+    const length = name.split(" ").length;
+    return name.split(" ")[length - 1];
+}
+
 const Header = () => {
+    const { userInfo } = useAuth();
     return (
         <HeaderStyles>
             <div className="container">
@@ -126,13 +134,24 @@ const Header = () => {
                         </div>
                     </div>
 
-                    <Button
-                        className="header-button"
-                        height="56px"
-                        to="/sign-up"
-                    >
-                        Sign Up
-                    </Button>
+                    {!userInfo ? (
+                        <Button
+                            className="header-button"
+                            height="56px"
+                            to="/sign-up"
+                            type="button"
+                        >
+                            Sign Up
+                        </Button>
+                    ) : (
+                        <div className="header-auth">
+                            <span>Welcom back,</span>
+                            <strong className="text-primary">
+                                {" "}
+                                {getLastName(userInfo?.displayName)}
+                            </strong>
+                        </div>
+                    )}
                 </div>
             </div>
         </HeaderStyles>
