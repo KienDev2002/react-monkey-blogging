@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -7,13 +7,13 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "react-toastify";
 import { Button } from "~/components/button";
 import { Field } from "~/components/field";
-import { IconEyeClose, IconEyeOpen } from "~/components/icon";
 import { Input } from "~/components/input";
 import { Label } from "~/components/label";
 import { useAuth } from "~/contexts/auth-context";
 import AuthenticationPage from "./AuthenticationPage";
-import { signInAnonymously, signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "~/components/firebase/firebase-config";
+import InputPasswordToggle from "~/components/input/InputPasswordToggle";
 
 const schema = yup.object({
     email: yup
@@ -36,7 +36,6 @@ const SignInPage = () => {
         resolver: yupResolver(schema),
     });
 
-    const [togglePassword, setTogglePassword] = useState(false);
     const hanleSignIn = async (values) => {
         if (!isValid) return;
         await signInWithEmailAndPassword(auth, values.email, values.password);
@@ -55,7 +54,7 @@ const SignInPage = () => {
     useEffect(() => {
         document.title = "Login Page";
         if (userInfo?.email) {
-            navigate("/");
+            // navigate("/");
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -74,22 +73,9 @@ const SignInPage = () => {
                 </Field>
                 <Field>
                     <Label htmlFor="password">Password</Label>
-                    <Input
+                    <InputPasswordToggle
                         control={control}
-                        type={togglePassword ? "text" : "password"}
-                        name="password"
-                        placeholder="Enter your password"
-                    >
-                        {!togglePassword ? (
-                            <IconEyeClose
-                                onClick={() => setTogglePassword(true)}
-                            ></IconEyeClose>
-                        ) : (
-                            <IconEyeOpen
-                                onClick={() => setTogglePassword(false)}
-                            ></IconEyeOpen>
-                        )}
-                    </Input>
+                    ></InputPasswordToggle>
                 </Field>
                 <div className="have-account">
                     Haven't you already had an account?

@@ -1,22 +1,20 @@
 import React from "react";
-import styled from "styled-components";
 import { useForm } from "react-hook-form";
 import { Input } from "~/components/input";
 import { Label } from "~/components/label";
-import { IconEyeClose, IconEyeOpen } from "~/components/icon";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
 import { Field } from "~/components/field";
-import { useState } from "react";
 import { Button } from "~/components/button";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth, db } from "~/components/firebase/firebase-config";
 import { NavLink, useNavigate } from "react-router-dom";
 import { addDoc, collection } from "firebase/firestore";
 import AuthenticationPage from "./AuthenticationPage";
-import { useAuth } from "~/contexts/auth-context";
+
+import InputPasswordToggle from "~/components/input/InputPasswordToggle";
 
 const schema = yup.object({
     fullname: yup.string().required("please enter your fullname"),
@@ -36,13 +34,11 @@ const SignUpPage = () => {
         control,
         handleSubmit,
         formState: { errors, isValid, isSubmitting },
-        watch,
-        reset,
     } = useForm({ mode: "onChange", resolver: yupResolver(schema) });
 
     const hanleSignUp = async (values) => {
         if (!isValid) return;
-        const user = await createUserWithEmailAndPassword(
+        await createUserWithEmailAndPassword(
             auth,
             values.email,
             values.password
@@ -59,7 +55,6 @@ const SignUpPage = () => {
         toast.success("Register successfully");
         navigate("/");
     };
-    const [togglePassword, setTogglePassword] = useState(false);
     useEffect(() => {
         const arrError = Object.values(errors);
         if (arrError.length > 0) {
@@ -96,22 +91,9 @@ const SignUpPage = () => {
                 </Field>
                 <Field>
                     <Label htmlFor="password">Password</Label>
-                    <Input
+                    <InputPasswordToggle
                         control={control}
-                        type={togglePassword ? "text" : "password"}
-                        name="password"
-                        placeholder="Enter your password"
-                    >
-                        {!togglePassword ? (
-                            <IconEyeClose
-                                onClick={() => setTogglePassword(true)}
-                            ></IconEyeClose>
-                        ) : (
-                            <IconEyeOpen
-                                onClick={() => setTogglePassword(false)}
-                            ></IconEyeOpen>
-                        )}
-                    </Input>
+                    ></InputPasswordToggle>
                 </Field>
 
                 <div className="have-account">
