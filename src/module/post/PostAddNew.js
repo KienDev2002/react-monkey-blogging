@@ -5,17 +5,19 @@ import { Label } from "~/components/label";
 import React from "react";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
-import { Checkbox, Radio } from "~/components/checkbox";
-import { Dropdown } from "~/components/dropdown";
+import { Radio } from "~/components/checkbox";
+import { Dropdown, Option } from "~/components/dropdown";
+import slugify from "slugify";
+import { postStatus } from "~/utils/constants";
 const PostAddNewStyles = styled.div``;
 
 const PostAddNew = () => {
-    const { control, watch, setValue } = useForm({
+    const { control, watch, setValue, handleSubmit } = useForm({
         mode: "onChange",
         defaultValues: {
             title: "",
-            slur: "",
-            status: "",
+            slug: "",
+            status: 2,
             category: "",
         },
     });
@@ -23,10 +25,16 @@ const PostAddNew = () => {
     const watchCategory = watch("category");
     console.log("PostAddNew ~ watchCategory", watchCategory);
 
+    const addPostHanler = async (values) => {
+        const cloneValues = { ...values };
+        cloneValues.slug = slugify(values.slug || values.title);
+        cloneValues.status = Number(values.status);
+        console.log(cloneValues);
+    };
     return (
         <PostAddNewStyles>
             <h1 className="dashboard-heading">Add new post</h1>
-            <form>
+            <form onSubmit={handleSubmit(addPostHanler)}>
                 <div className="grid grid-cols-2 mb-10 gap-x-10">
                     <Field>
                         <Label>Title</Label>
@@ -52,27 +60,30 @@ const PostAddNew = () => {
                             <Radio
                                 name="status"
                                 control={control}
-                                checked={watchStatus === "approved"}
-                                onClick={() => setValue("status", "approved")}
-                                value="approved"
+                                checked={
+                                    Number(watchStatus) === postStatus.APPROVED
+                                }
+                                value={postStatus.APPROVED}
                             >
                                 Approved
                             </Radio>
                             <Radio
                                 name="status"
                                 control={control}
-                                checked={watchStatus === "pending"}
-                                onClick={() => setValue("status", "pending")}
-                                value="pending"
+                                checked={
+                                    Number(watchStatus) === postStatus.PENDING
+                                }
+                                value={postStatus.PENDING}
                             >
                                 Pending
                             </Radio>
                             <Radio
                                 name="status"
                                 control={control}
-                                checked={watchStatus === "reject"}
-                                onClick={() => setValue("status", "reject")}
-                                value="reject"
+                                checked={
+                                    Number(watchStatus) === postStatus.REJECTED
+                                }
+                                value={postStatus.REJECTED}
                             >
                                 Reject
                             </Radio>
@@ -90,11 +101,11 @@ const PostAddNew = () => {
                     <Field>
                         <Label>Category</Label>
                         <Dropdown>
-                            <Dropdown.Option>Knowledge</Dropdown.Option>
-                            <Dropdown.Option>Blockchain</Dropdown.Option>
-                            <Dropdown.Option>Setup</Dropdown.Option>
-                            <Dropdown.Option>Nature</Dropdown.Option>
-                            <Dropdown.Option>Developer</Dropdown.Option>
+                            <Option>Knowledge</Option>
+                            <Option>Blockchain</Option>
+                            <Option>Setup</Option>
+                            <Option>Nature</Option>
+                            <Option>Developer</Option>
                         </Dropdown>
                     </Field>
                     <Field></Field>
