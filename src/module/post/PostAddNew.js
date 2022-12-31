@@ -23,34 +23,54 @@ import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "~/components/firebase/firebase-config";
 import Toggle from "~/components/toggle/Toggle";
 import { useEffect } from "react";
+import { useAuth } from "~/contexts/auth-context";
+import { toast } from "react-toastify";
 
 const PostAddNewStyles = styled.div``;
 
 const PostAddNew = () => {
-    const { control, watch, setValue, handleSubmit, getValues } = useForm({
-        mode: "onChange",
-        defaultValues: {
-            title: "",
-            slug: "",
-            status: 2,
-            categoryId: "",
-            hot: false,
-        },
-    });
+    const { userInfo } = useAuth();
+    const [progress, setProgress] = useState(0);
+    const [image, setImage] = useState("");
+    const { control, watch, setValue, handleSubmit, getValues, reset } =
+        useForm({
+            mode: "onChange",
+            defaultValues: {
+                title: "",
+                slug: "",
+                status: 2,
+                categoryId: "",
+                hot: false,
+                image: "",
+            },
+        });
     const watchStatus = watch("status");
     const watchHot = watch("hot");
     // console.log("PostAddNew ~ watchCategory", watchCategory);
 
     const addPostHanler = async (values) => {
         const cloneValues = { ...values };
-        cloneValues.slug = slugify(values.slug || values.title);
+        cloneValues.slug = slugify(values.slug || values.title, {
+            lower: true,
+        });
         cloneValues.status = Number(values.status);
-
-        console.log(cloneValues);
+        const colRef = collection(db, "posts");
+        await addDoc(colRef, {
+            ...cloneValues,
+            image,
+            userId: userInfo.uid,
+        });
+        toast.success("Create new post successfully");
+        reset({
+            title: "",
+            slug: "",
+            status: 2,
+            categoryId: "",
+            hot: false,
+            image: "",
+        });
+        setSelectCategory({});
     };
-
-    const [progress, setProgress] = useState(0);
-    const [image, setImage] = useState("");
 
     const handleUploadImage = (file) => {
         const storage = getStorage();
@@ -134,6 +154,11 @@ const PostAddNew = () => {
         }
         getData();
     }, []);
+    const [selectCategory, setSelectCategory] = useState("");
+    const handleClickOption = (item) => {
+        setValue("categoryId", item.id);
+        setSelectCategory(item);
+    };
     return (
         <PostAddNewStyles>
             <h1 className="dashboard-heading">Add new post</h1>
@@ -179,7 +204,7 @@ const PostAddNew = () => {
                                     categories.map((item) => (
                                         <Option
                                             onClick={() =>
-                                                setValue("categoryId", item.id)
+                                                handleClickOption(item)
                                             }
                                             key={item.id}
                                         >
@@ -188,6 +213,11 @@ const PostAddNew = () => {
                                     ))}
                             </List>
                         </Dropdown>
+                        {selectCategory?.name && (
+                            <span className="inline-block p-4 text-xl font-medium text-green-600 rounded-lg bg-green-50">
+                                {selectCategory?.name}
+                            </span>
+                        )}
                     </Field>
                 </div>
                 <div className="grid grid-cols-2 mb-10 gap-x-10">

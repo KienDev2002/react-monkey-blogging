@@ -30,3 +30,7 @@
 -   role: 1(Admin) 2(Mod) 3(User)
 -   permissions: "ADD_POST"
 -   createdAt
+
+--
+
+Hướng dẫn setup phòng cực chill dành cho người mới toàn tập
