@@ -6,7 +6,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import { Radio } from "~/components/checkbox";
-import { Dropdown, Option } from "~/components/dropdown";
+import { Dropdown, List, Option, Select } from "~/components/dropdown";
 import slugify from "slugify";
 import { postStatus } from "~/utils/constants";
 
@@ -33,7 +33,7 @@ const PostAddNew = () => {
             title: "",
             slug: "",
             status: 2,
-            category: "",
+            categoryId: "",
             hot: false,
         },
     });
@@ -116,6 +116,8 @@ const PostAddNew = () => {
             });
     };
 
+    const [categories, setCategories] = useState([]);
+
     useEffect(() => {
         async function getData() {
             const colRef = collection(db, "categories");
@@ -128,6 +130,7 @@ const PostAddNew = () => {
                     ...doc.data(),
                 });
             });
+            setCategories(results);
         }
         getData();
     }, []);
@@ -167,6 +170,24 @@ const PostAddNew = () => {
                     </Field>
                     <Field>
                         <Label>Category</Label>
+                        <Dropdown>
+                            <Select
+                                placeholder={"Select the category"}
+                            ></Select>
+                            <List>
+                                {categories.length > 0 &&
+                                    categories.map((item) => (
+                                        <Option
+                                            onClick={() =>
+                                                setValue("categoryId", item.id)
+                                            }
+                                            key={item.id}
+                                        >
+                                            {item.name}
+                                        </Option>
+                                    ))}
+                            </List>
+                        </Dropdown>
                     </Field>
                 </div>
                 <div className="grid grid-cols-2 mb-10 gap-x-10">
@@ -176,13 +197,6 @@ const PostAddNew = () => {
                             on={watchHot === true}
                             onClick={() => setValue("hot", !watchHot)}
                         ></Toggle>
-                        <Dropdown>
-                            <Option>Knowledge</Option>
-                            <Option>Blockchain</Option>
-                            <Option>Setup</Option>
-                            <Option>Nature</Option>
-                            <Option>Developer</Option>
-                        </Dropdown>
                     </Field>
                     <Field>
                         <Label>Status</Label>
