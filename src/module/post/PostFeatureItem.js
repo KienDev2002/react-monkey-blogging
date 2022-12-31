@@ -2,6 +2,7 @@ import { doc, getDoc } from "firebase/firestore";
 import React from "react";
 import { useEffect } from "react";
 import { useState } from "react";
+import slugify from "slugify";
 import styled from "styled-components";
 import { db } from "~/components/firebase/firebase-config";
 import PostCategory from "./PostCategory";
@@ -86,11 +87,18 @@ const PostFeatureItem = ({ data }) => {
             <div className="post-content">
                 <div className="post-top">
                     {category?.name && (
-                        <PostCategory>{category?.name}</PostCategory>
+                        <PostCategory to={category?.slug}>
+                            {category?.name}
+                        </PostCategory>
                     )}
-                    <PostMeta authorName={user?.fullname}></PostMeta>
+                    <PostMeta
+                        to={slugify(user?.fullname || "", { lower: true })}
+                        authorName={user?.fullname}
+                    ></PostMeta>
                 </div>
-                <PostTitle size="big">{data.title}</PostTitle>
+                <PostTitle to={data.slug} size="big">
+                    {data.title}
+                </PostTitle>
             </div>
         </PostFeatureItemStyles>
     );
