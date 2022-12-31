@@ -16,6 +16,10 @@ import {
     uploadBytesResumable,
     getDownloadURL,
 } from "firebase/storage";
+import ImageUpload from "~/components/image/ImageUpload";
+import { useState } from "react";
+import { addDoc, collection } from "firebase/firestore";
+import { db } from "~/components/firebase/firebase-config";
 
 const PostAddNewStyles = styled.div``;
 
@@ -37,9 +41,12 @@ const PostAddNew = () => {
         const cloneValues = { ...values };
         cloneValues.slug = slugify(values.slug || values.title);
         cloneValues.status = Number(values.status);
-        // handleUploadImage(cloneValues.image);
+
         console.log(cloneValues);
     };
+
+    const [progress, setProgress] = useState(0);
+    const [image, setImage] = useState("");
 
     const handleUploadImage = (file) => {
         const storage = getStorage();
@@ -50,9 +57,9 @@ const PostAddNew = () => {
             "state_changed",
             (snapshot) => {
                 // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-                const progress =
+                const progressPercent =
                     (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                console.log("Upload is " + progress + "% done");
+                setProgress(progressPercent);
                 // snapshot.state: trạng thái hình ảnh
                 switch (snapshot.state) {
                     case "paused":
@@ -74,7 +81,7 @@ const PostAddNew = () => {
             () => {
                 // Upload completed successfully, now we can get the download URL
                 getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                    console.log("File available at", downloadURL);
+                    setImage(downloadURL);
                 });
             }
         );
@@ -84,6 +91,7 @@ const PostAddNew = () => {
         const file = e.target.files[0];
         if (!file) return;
         setValue("image", file);
+        handleUploadImage(file);
     };
     return (
         <PostAddNewStyles>
@@ -110,11 +118,13 @@ const PostAddNew = () => {
                 <div className="grid grid-cols-2 mb-10 gap-x-10">
                     <Field>
                         <Label>Image</Label>
-                        <input
-                            type="file"
-                            name="image"
+
+                        <ImageUpload
+                            className="h-[250px]"
                             onChange={onSelectImage}
-                        ></input>
+                            progress={progress}
+                            image={image}
+                        ></ImageUpload>
                     </Field>
                     <Field>
                         <Label>Status</Label>
