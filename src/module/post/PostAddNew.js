@@ -9,6 +9,14 @@ import { Radio } from "~/components/checkbox";
 import { Dropdown, Option } from "~/components/dropdown";
 import slugify from "slugify";
 import { postStatus } from "~/utils/constants";
+
+import {
+    getStorage,
+    ref,
+    uploadBytesResumable,
+    getDownloadURL,
+} from "firebase/storage";
+
 const PostAddNewStyles = styled.div``;
 
 const PostAddNew = () => {
@@ -23,13 +31,59 @@ const PostAddNew = () => {
     });
     const watchStatus = watch("status");
     const watchCategory = watch("category");
-    console.log("PostAddNew ~ watchCategory", watchCategory);
+    // console.log("PostAddNew ~ watchCategory", watchCategory);
 
     const addPostHanler = async (values) => {
         const cloneValues = { ...values };
         cloneValues.slug = slugify(values.slug || values.title);
         cloneValues.status = Number(values.status);
+        // handleUploadImage(cloneValues.image);
         console.log(cloneValues);
+    };
+
+    const handleUploadImage = (file) => {
+        const storage = getStorage();
+        const storageRef = ref(storage, "images/" + file.name);
+        const uploadTask = uploadBytesResumable(storageRef, file);
+        // Listen for state changes, errors, and completion of the upload.
+        uploadTask.on(
+            "state_changed",
+            (snapshot) => {
+                // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+                const progress =
+                    (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                console.log("Upload is " + progress + "% done");
+                // snapshot.state: trạng thái hình ảnh
+                switch (snapshot.state) {
+                    case "paused":
+                        console.log("Upload is paused");
+                        break;
+                    case "running":
+                        console.log("Upload is running");
+                        break;
+                    default:
+                        console.log("Nothing at all");
+                }
+            },
+            (error) => {
+                // A full list of error codes is available at
+                // https://firebase.google.com/docs/storage/web/handle-errors
+
+                console.log("Error");
+            },
+            () => {
+                // Upload completed successfully, now we can get the download URL
+                getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                    console.log("File available at", downloadURL);
+                });
+            }
+        );
+    };
+
+    const onSelectImage = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        setValue("image", file);
     };
     return (
         <PostAddNewStyles>
@@ -54,6 +108,14 @@ const PostAddNew = () => {
                     </Field>
                 </div>
                 <div className="grid grid-cols-2 mb-10 gap-x-10">
+                    <Field>
+                        <Label>Image</Label>
+                        <input
+                            type="file"
+                            name="image"
+                            onChange={onSelectImage}
+                        ></input>
+                    </Field>
                     <Field>
                         <Label>Status</Label>
                         <div className="flex items-center gap-x-5">
@@ -88,13 +150,6 @@ const PostAddNew = () => {
                                 Reject
                             </Radio>
                         </div>
-                    </Field>
-                    <Field>
-                        <Label>Author</Label>
-                        <Input
-                            control={control}
-                            placeholder="Find the author"
-                        ></Input>
                     </Field>
                 </div>
                 <div className="grid grid-cols-2 mb-10 gap-x-10">
