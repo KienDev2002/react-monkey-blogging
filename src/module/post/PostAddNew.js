@@ -19,7 +19,14 @@ import {
 } from "firebase/storage";
 import ImageUpload from "~/components/image/ImageUpload";
 import { useState } from "react";
-import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
+import {
+    addDoc,
+    collection,
+    getDocs,
+    query,
+    serverTimestamp,
+    where,
+} from "firebase/firestore";
 import { db } from "~/components/firebase/firebase-config";
 import Toggle from "~/components/toggle/Toggle";
 import { useEffect } from "react";
@@ -42,6 +49,7 @@ const PostAddNew = () => {
                 categoryId: "",
                 hot: false,
                 image: "",
+                createdAt: serverTimestamp,
             },
         });
     const watchStatus = watch("status");

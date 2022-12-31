@@ -11,7 +11,7 @@ import { Button } from "~/components/button";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth, db } from "~/components/firebase/firebase-config";
 import { NavLink, useNavigate } from "react-router-dom";
-import { addDoc, collection } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 import AuthenticationPage from "./AuthenticationPage";
 
 import InputPasswordToggle from "~/components/input/InputPasswordToggle";
@@ -46,12 +46,18 @@ const SignUpPage = () => {
         updateProfile(auth.currentUser, {
             displayName: values.fullname,
         });
-        const colRef = collection(db, "users");
-        await addDoc(colRef, {
+        // const colRef = collection(db, "users");
+        // create users in doc có id là id của user in authentication firebase
+        await setDoc(doc(db, "users", auth.currentUser.uid), {
             fullname: values.fullname,
             email: values.email,
             password: values.password,
         });
+        // await setDoc(colRef, {
+        //     fullname: values.fullname,
+        //     email: values.email,
+        //     password: values.password,
+        // });
         toast.success("Register successfully");
         navigate("/");
     };
