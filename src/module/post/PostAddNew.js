@@ -21,6 +21,7 @@ import ImageUpload from "~/components/image/ImageUpload";
 import { useState } from "react";
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "~/components/firebase/firebase-config";
+import Toggle from "~/components/toggle/Toggle";
 
 const PostAddNewStyles = styled.div``;
 
@@ -32,10 +33,11 @@ const PostAddNew = () => {
             slug: "",
             status: 2,
             category: "",
+            hot: false,
         },
     });
     const watchStatus = watch("status");
-    const watchCategory = watch("category");
+    const watchHot = watch("hot");
     // console.log("PostAddNew ~ watchCategory", watchCategory);
 
     const addPostHanler = async (values) => {
@@ -184,7 +186,11 @@ const PostAddNew = () => {
                 </div>
                 <div className="grid grid-cols-2 mb-10 gap-x-10">
                     <Field>
-                        <Label>Category</Label>
+                        <Label>Feature post</Label>
+                        <Toggle
+                            on={watchHot === true}
+                            onClick={() => setValue("hot", !watchHot)}
+                        ></Toggle>
                         <Dropdown>
                             <Option>Knowledge</Option>
                             <Option>Blockchain</Option>

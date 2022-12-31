@@ -14,13 +14,13 @@ const Toggle = (props) => {
                 onClick={onClick}
             />
             <div
-                className={`inline-block w-[70px] h-[42px] relative cursor-pointer rounded-full p-1 transition-all ${
+                className={`inline-block w-[70px] h-[42px] relative cursor-pointer rounded-full pt-1.5 pl-2 transition-all ${
                     on ? "bg-green-500" : "bg-gray-300"
                 }`}
                 {...rest}
             >
                 <span
-                    className={`transition-all w-[34px] h-[34px] bg-white rounded-full inline-block ${
+                    className={` transition-all w-[34px] h-[34px] bg-white rounded-full inline-block ${
                         on ? "translate-x-[28px]" : ""
                     }`}
                 ></span>
