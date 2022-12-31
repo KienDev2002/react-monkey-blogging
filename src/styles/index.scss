@@ -1,21 +1,8 @@
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-}
-* {
-    margin: 0;
-    padding: 0;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url(_reset.scss);
 
-html {
-    font-size: 62.5%;
-}
-
-html,
-body {
-    height: 100%;
-}
 body {
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
@@ -25,36 +12,9 @@ body {
     font-family: "Montserrat", sans-serif;
     color: #232323;
 }
-
-img,
-picture,
-video,
-canvas,
-svg {
-    display: block;
-    max-width: 100%;
-}
-input,
-button,
-textarea,
-select {
-    font: inherit;
-    outline: none;
-    border: none;
-}
-p,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-    overflow-wrap: break-word;
-}
-
 .container {
     width: 100%;
-    max-width: 1180px;
+    max-width: 1260px;
     margin: 0 auto;
     padding: 0 20px;
 }
@@ -102,4 +62,16 @@ a {
     @media screen and (min-width: 1024px) {
         padding-bottom: 60px;
     }
+}
+
+.hidden-input {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+    white-space: nowrap;
 }
