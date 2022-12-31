@@ -19,9 +19,10 @@ import {
 } from "firebase/storage";
 import ImageUpload from "~/components/image/ImageUpload";
 import { useState } from "react";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "~/components/firebase/firebase-config";
 import Toggle from "~/components/toggle/Toggle";
+import { useEffect } from "react";
 
 const PostAddNewStyles = styled.div``;
 
@@ -114,6 +115,22 @@ const PostAddNew = () => {
                 console.log("Uh-oh, an error occurred!");
             });
     };
+
+    useEffect(() => {
+        async function getData() {
+            const colRef = collection(db, "categories");
+            const q = query(colRef, where("status", "==", 1));
+            const querySnapshot = await getDocs(q);
+            let results = [];
+            querySnapshot.forEach((doc) => {
+                results.push({
+                    id: doc.id,
+                    ...doc.data(),
+                });
+            });
+        }
+        getData();
+    }, []);
     return (
         <PostAddNewStyles>
             <h1 className="dashboard-heading">Add new post</h1>
@@ -147,6 +164,25 @@ const PostAddNew = () => {
                             image={image}
                             handleDeleteImage={handleDeleteImage}
                         ></ImageUpload>
+                    </Field>
+                    <Field>
+                        <Label>Category</Label>
+                    </Field>
+                </div>
+                <div className="grid grid-cols-2 mb-10 gap-x-10">
+                    <Field>
+                        <Label>Feature post</Label>
+                        <Toggle
+                            on={watchHot === true}
+                            onClick={() => setValue("hot", !watchHot)}
+                        ></Toggle>
+                        <Dropdown>
+                            <Option>Knowledge</Option>
+                            <Option>Blockchain</Option>
+                            <Option>Setup</Option>
+                            <Option>Nature</Option>
+                            <Option>Developer</Option>
+                        </Dropdown>
                     </Field>
                     <Field>
                         <Label>Status</Label>
@@ -183,23 +219,6 @@ const PostAddNew = () => {
                             </Radio>
                         </div>
                     </Field>
-                </div>
-                <div className="grid grid-cols-2 mb-10 gap-x-10">
-                    <Field>
-                        <Label>Feature post</Label>
-                        <Toggle
-                            on={watchHot === true}
-                            onClick={() => setValue("hot", !watchHot)}
-                        ></Toggle>
-                        <Dropdown>
-                            <Option>Knowledge</Option>
-                            <Option>Blockchain</Option>
-                            <Option>Setup</Option>
-                            <Option>Nature</Option>
-                            <Option>Developer</Option>
-                        </Dropdown>
-                    </Field>
-                    <Field></Field>
                 </div>
                 <Button type="submit" className="mx-auto">
                     Add new post
