@@ -4,9 +4,9 @@ import { Input } from "~/components/input";
 import { Label } from "~/components/label";
 import React from "react";
 import { useForm } from "react-hook-form";
-import DashboardHeading from "../module/dashboard/DashboardHeading";
 import { Field } from "~/components/field";
 import { FieldCheckboxes } from "~/components/field";
+import DashboardHeading from "~/module/dashboard/DashboardHeading";
 
 const UserAddNew = () => {
     const { control } = useForm({

@@ -1,5 +1,5 @@
 import React from "react";
-import DashboardHeading from "../module/dashboard/DashboardHeading";
+import DashboardHeading from "~/module/dashboard/DashboardHeading";
 
 const UserManage = () => {
     return (

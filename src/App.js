@@ -10,12 +10,12 @@ import NotFoundPage from "./pages/NotFoundPage";
 import PostDetailsPage from "~/pages/PostDetailsPage";
 import PostAddNew from "./module/post/PostAddNew";
 
-import UserAddNew from "./drafts/UserAddNew";
-import UserManage from "./drafts/UserManage";
-import UserProfile from "./drafts/UserProfile";
 import CategoryManage from "./module/category/CategoryManage";
 import CategoryAddNew from "./module/category/CategoryAddNew";
 import CategoryUpdate from "./module/category/CategoryUpdate";
+import UserManage from "~/module/user/UserManage";
+import UserAddNew from "~/module/user/UserAddNew";
+import UserProfile from "~/module/user/UserProfile";
 function App() {
     return (
         <AuthProvider>
