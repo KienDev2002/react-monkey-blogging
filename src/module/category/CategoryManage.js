@@ -113,7 +113,7 @@ const CategoryManage = () => {
         <div>
             <DashboardHeading title="Categories" desc="Manage your category">
                 <Button kind="ghost" height="60px" to="/manage/add-category">
-                    Create category
+                    Create new category
                 </Button>
             </DashboardHeading>
             <div className="flex justify-end mb-10">
