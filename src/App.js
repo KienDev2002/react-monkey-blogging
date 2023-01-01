@@ -9,6 +9,12 @@ import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import PostDetailsPage from "~/pages/PostDetailsPage";
 import PostAddNew from "./module/post/PostAddNew";
+
+import UserAddNew from "./drafts/UserAddNew";
+import UserManage from "./drafts/UserManage";
+import UserProfile from "./drafts/UserProfile";
+import CategoryManage from "./module/category/CategoryManage";
+import CategoryAddNew from "./module/category/CategoryAddNew";
 function App() {
     return (
         <AuthProvider>
@@ -39,6 +45,26 @@ function App() {
                     <Route
                         path="/manage/add-post"
                         element={<PostAddNew></PostAddNew>}
+                    ></Route>
+                    <Route
+                        path="/manage/category"
+                        element={<CategoryManage></CategoryManage>}
+                    ></Route>
+                    <Route
+                        path="/manage/add-category"
+                        element={<CategoryAddNew></CategoryAddNew>}
+                    ></Route>
+                    <Route
+                        path="/manage/user"
+                        element={<UserManage></UserManage>}
+                    ></Route>
+                    <Route
+                        path="/manage/add-user"
+                        element={<UserAddNew></UserAddNew>}
+                    ></Route>
+                    <Route
+                        path="/profile"
+                        element={<UserProfile></UserProfile>}
                     ></Route>
                 </Route>
             </Routes>

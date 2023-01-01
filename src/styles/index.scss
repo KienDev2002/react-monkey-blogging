@@ -9,7 +9,6 @@ body {
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     font-size: 1.6rem; // 1.6rem phụ thuộc vào thằng gốc là 62.5% html
     font-family: "Poppins", sans-serif;
-    font-family: "Montserrat", sans-serif;
     color: #232323;
 }
 .container {
@@ -74,4 +73,8 @@ a {
     position: absolute;
     width: 1px;
     white-space: nowrap;
+}
+
+.form-layout {
+    @apply grid grid-cols-1 lg:grid-cols-2 lg:gap-x-10 mb-5 lg:mb-10;
 }
