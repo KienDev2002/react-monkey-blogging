@@ -16,3 +16,8 @@ export const postStatus = {
     PENDING: 2,
     REJECTED: 3,
 };
+
+export const catogoryStatus = {
+    APPROVED: 1,
+    UNAPPROVED: 2,
+};

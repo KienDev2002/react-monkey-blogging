@@ -6,7 +6,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import DashboardHeading from "./DashboardHeading";
 import { Field } from "~/components/field";
-import FieldCheckboxes from "./FieldCheckboxes";
+import { FieldCheckboxes } from "~/components/field";
 
 const UserAddNew = () => {
     const { control } = useForm({
