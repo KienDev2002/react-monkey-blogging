@@ -2,8 +2,11 @@ import {
     collection,
     deleteDoc,
     doc,
+    getDocs,
+    limit,
     onSnapshot,
     query,
+    startAfter,
     where,
 } from "firebase/firestore";
 import React from "react";
@@ -20,31 +23,71 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "~/components/button";
 import { debounce } from "lodash";
 
+const CATEGORY_PER_PAGE = 1;
+
 const CategoryManage = () => {
     const [categoryList, setCategoryList] = useState([]);
-    const [categoryCount, setCategoryCount] = useState(0);
     const navigate = useNavigate();
     const [filter, setFilter] = useState("");
-    useEffect(() => {
-        const colRef = collection(db, "categories");
-        const newRef = filter
-            ? query(
-                  colRef,
-                  where("name", ">=", filter),
-                  where("name", "<=", filter + "utf8")
-              )
-            : colRef;
-        onSnapshot(newRef, (snapshot) => {
+    const [lastDoc, setLastDoc] = useState();
+    const [totalCategory, setTotalCategory] = useState(0);
+
+    const handleLoadMoreCategory = async () => {
+        const nextRef = query(
+            collection(db, "categories"),
+            startAfter(lastDoc || 0),
+            limit(CATEGORY_PER_PAGE)
+        );
+
+        onSnapshot(nextRef, (snapshot) => {
             const results = [];
-            setCategoryCount(Number(snapshot.size));
             snapshot.forEach((doc) => {
                 results.push({
                     id: doc.id,
                     ...doc.data(),
                 });
             });
-            setCategoryList(results);
+            setCategoryList([...categoryList, ...results]);
         });
+        const documentSnapshots = await getDocs(nextRef);
+
+        // Get the last visible document
+        const lastVisible =
+            documentSnapshots.docs[documentSnapshots.docs.length - 1];
+        setLastDoc(lastVisible);
+    };
+    useEffect(() => {
+        async function fetchData() {
+            const colRef = collection(db, "categories");
+            onSnapshot(colRef, (snapshot) => {
+                setTotalCategory(snapshot.size);
+            });
+            const newRef = filter
+                ? query(
+                      colRef,
+                      where("name", ">=", filter),
+                      where("name", "<=", filter + "utf8")
+                  )
+                : query(colRef, limit(CATEGORY_PER_PAGE));
+            const documentSnapshots = await getDocs(newRef);
+
+            // Get the last visible document
+            const lastVisible =
+                documentSnapshots.docs[documentSnapshots.docs.length - 1];
+
+            setLastDoc(lastVisible);
+            onSnapshot(newRef, (snapshot) => {
+                const results = [];
+                snapshot.forEach((doc) => {
+                    results.push({
+                        id: doc.id,
+                        ...doc.data(),
+                    });
+                });
+                setCategoryList(results);
+            });
+        }
+        fetchData();
     }, [filter]);
     const handleDeleteCategory = (docId) => {
         const docRef = doc(db, "categories", docId);
@@ -139,6 +182,16 @@ const CategoryManage = () => {
                         ))}
                 </tbody>
             </Table>
+            {totalCategory > categoryList.length && (
+                <div className="mt-10">
+                    <Button
+                        onClick={handleLoadMoreCategory}
+                        className="mx-auto"
+                    >
+                        Load more
+                    </Button>
+                </div>
+            )}
         </div>
     );
 };
