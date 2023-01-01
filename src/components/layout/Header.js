@@ -144,13 +144,14 @@ const Header = () => {
                             Sign Up
                         </Button>
                     ) : (
-                        <div className="header-auth">
-                            <span>Welcom back,</span>
-                            <strong className="text-primary">
-                                {" "}
-                                {getLastName(userInfo?.displayName)}
-                            </strong>
-                        </div>
+                        <Button
+                            className="header-button"
+                            height="56px"
+                            to="/dashboard"
+                            type="button"
+                        >
+                            Dashboard
+                        </Button>
                     )}
                 </div>
             </div>
@@ -159,3 +160,13 @@ const Header = () => {
 };
 
 export default Header;
+
+{
+    /* <div className="header-auth">
+                            <span>Welcom back,</span>
+                            <strong className="text-primary">
+                                {" "}
+                                {getLastName(userInfo?.displayName)}
+                            </strong>
+                        </div> */
+}

@@ -11,11 +11,12 @@ import { Button } from "~/components/button";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth, db } from "~/components/firebase/firebase-config";
 import { NavLink, useNavigate } from "react-router-dom";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import AuthenticationPage from "./AuthenticationPage";
 
 import InputPasswordToggle from "~/components/input/InputPasswordToggle";
 import slugify from "slugify";
+import { userRole, userStatus } from "~/utils/constants";
 
 const schema = yup.object({
     fullname: yup.string().required("please enter your fullname"),
@@ -46,6 +47,8 @@ const SignUpPage = () => {
         );
         updateProfile(auth.currentUser, {
             displayName: values.fullname,
+            photoURL:
+                "https://tse4.mm.bing.net/th?id=OIP.fpaUV35ECaGkz-YNCrBSwQHaHa&pid=Api&P=0",
         });
         // const colRef = collection(db, "users");
         // create users in doc có id là id của user in authentication firebase
@@ -54,6 +57,10 @@ const SignUpPage = () => {
             email: values.email,
             password: values.password,
             username: slugify(values.fullname, { lower: true }),
+            avatar: "https://tse4.mm.bing.net/th?id=OIP.fpaUV35ECaGkz-YNCrBSwQHaHa&pid=Api&P=0",
+            status: userStatus.ACTIVE,
+            role: userRole.USER,
+            createdAt: serverTimestamp(),
         });
         // await setDoc(colRef, {
         //     fullname: values.fullname,
