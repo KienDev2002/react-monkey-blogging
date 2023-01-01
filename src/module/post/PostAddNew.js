@@ -43,7 +43,6 @@ const PostAddNew = () => {
                 categoryId: "",
                 hot: false,
                 image: "",
-                createdAt: serverTimestamp(),
             },
         });
 
@@ -68,9 +67,11 @@ const PostAddNew = () => {
             const colRef = collection(db, "posts");
             await addDoc(colRef, {
                 ...cloneValues,
+                createdAt: serverTimestamp(),
                 image,
                 userId: userInfo.uid,
             });
+
             toast.success("Create new post successfully");
             reset({
                 title: "",
