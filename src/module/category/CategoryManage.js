@@ -13,11 +13,14 @@ import { ActionDelete, ActionEdit, ActionView } from "~/components/action";
 import { db } from "~/components/firebase/firebase-config";
 import { LabelStatus } from "~/components/label";
 import { Table } from "~/components/table";
-import DashboardHeading from "~/drafts/DashboardHeading";
+import DashboardHeading from "~/module/dashboard/DashboardHeading";
 import { catogoryStatus } from "~/utils/constants";
+import { useNavigate } from "react-router-dom";
+import { Button } from "~/components/button";
 
 const CategoryManage = () => {
     const [categoryList, setCategoryList] = useState([]);
+    const navigate = useNavigate();
     useEffect(() => {
         const colRef = collection(db, "categories");
         onSnapshot(colRef, (snapshot) => {
@@ -50,10 +53,11 @@ const CategoryManage = () => {
     };
     return (
         <div>
-            <DashboardHeading
-                title="Categories"
-                desc="Manage your category"
-            ></DashboardHeading>
+            <DashboardHeading title="Categories" desc="Manage your category">
+                <Button kind="ghost" height="60px" to="/manage/add-category">
+                    Create category
+                </Button>
+            </DashboardHeading>
             <Table>
                 <thead>
                     <tr>
@@ -92,7 +96,13 @@ const CategoryManage = () => {
                                 <td>
                                     <div className="flex items-center gap-x-3">
                                         <ActionView></ActionView>
-                                        <ActionEdit></ActionEdit>
+                                        <ActionEdit
+                                            onClick={() =>
+                                                navigate(
+                                                    `/manage/update-category?id=${category.id}`
+                                                )
+                                            }
+                                        ></ActionEdit>
                                         <ActionDelete
                                             onClick={() =>
                                                 handleDeleteCategory(

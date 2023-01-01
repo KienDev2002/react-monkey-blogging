@@ -14,6 +14,10 @@ const ButtonStyles = styled.button`
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 8px;
+    font-size: 1.8rem;
+    font-weight: 600;
+    height: ${(props) => props.height || "66px"};
     ${(props) =>
         props.kind === "secondary" &&
         css`
@@ -30,11 +34,12 @@ const ButtonStyles = styled.button`
                 ${(props) => props.theme.secondary}
             );
         `};
-    height: ${(props) => props.height || "66px"};
-
-    border-radius: 8px;
-    font-size: 1.8rem;
-    font-weight: 600;
+    ${(props) =>
+        props.kind === "ghost" &&
+        css`
+            color: ${(props) => props.theme.primary};
+            background-color: rgba(29, 192, 113, 0.1);
+        `};
 
     &:disabled {
         opacity: 0.5;
@@ -79,7 +84,7 @@ Button.propTypes = {
     isLoading: PropTypes.bool,
     onClick: PropTypes.func,
     children: PropTypes.node,
-    kind: PropTypes.oneOf(["primary", "secondary"]),
+    kind: PropTypes.oneOf(["primary", "secondary", "ghost"]),
 };
 
 export default Button;

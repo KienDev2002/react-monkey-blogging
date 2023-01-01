@@ -4,7 +4,7 @@ import { Input } from "~/components/input";
 import { Label } from "~/components/label";
 import React from "react";
 import { useForm } from "react-hook-form";
-import DashboardHeading from "./DashboardHeading";
+import DashboardHeading from "../module/dashboard/DashboardHeading";
 import { Field } from "~/components/field";
 import { FieldCheckboxes } from "~/components/field";
 

@@ -15,6 +15,7 @@ import UserManage from "./drafts/UserManage";
 import UserProfile from "./drafts/UserProfile";
 import CategoryManage from "./module/category/CategoryManage";
 import CategoryAddNew from "./module/category/CategoryAddNew";
+import CategoryUpdate from "./module/category/CategoryUpdate";
 function App() {
     return (
         <AuthProvider>
@@ -53,6 +54,10 @@ function App() {
                     <Route
                         path="/manage/add-category"
                         element={<CategoryAddNew></CategoryAddNew>}
+                    ></Route>
+                    <Route
+                        path="/manage/update-category"
+                        element={<CategoryUpdate></CategoryUpdate>}
                     ></Route>
                     <Route
                         path="/manage/user"
