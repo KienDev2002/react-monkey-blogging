@@ -2,8 +2,9 @@ import {
     collection,
     deleteDoc,
     doc,
-    getDoc,
     onSnapshot,
+    query,
+    where,
 } from "firebase/firestore";
 import React from "react";
 import { useEffect } from "react";
@@ -17,14 +18,25 @@ import DashboardHeading from "~/module/dashboard/DashboardHeading";
 import { catogoryStatus } from "~/utils/constants";
 import { useNavigate } from "react-router-dom";
 import { Button } from "~/components/button";
+import { debounce } from "lodash";
 
 const CategoryManage = () => {
     const [categoryList, setCategoryList] = useState([]);
+    const [categoryCount, setCategoryCount] = useState(0);
     const navigate = useNavigate();
+    const [filter, setFilter] = useState("");
     useEffect(() => {
         const colRef = collection(db, "categories");
-        onSnapshot(colRef, (snapshot) => {
+        const newRef = filter
+            ? query(
+                  colRef,
+                  where("name", ">=", filter),
+                  where("name", "<=", filter + "utf8")
+              )
+            : colRef;
+        onSnapshot(newRef, (snapshot) => {
             const results = [];
+            setCategoryCount(Number(snapshot.size));
             snapshot.forEach((doc) => {
                 results.push({
                     id: doc.id,
@@ -33,7 +45,7 @@ const CategoryManage = () => {
             });
             setCategoryList(results);
         });
-    }, []);
+    }, [filter]);
     const handleDeleteCategory = (docId) => {
         const docRef = doc(db, "categories", docId);
         Swal.fire({
@@ -51,6 +63,9 @@ const CategoryManage = () => {
             }
         });
     };
+    const hanleInputFilter = debounce((e) => {
+        setFilter(e.target.value);
+    }, 500);
     return (
         <div>
             <DashboardHeading title="Categories" desc="Manage your category">
@@ -58,6 +73,14 @@ const CategoryManage = () => {
                     Create category
                 </Button>
             </DashboardHeading>
+            <div className="flex justify-end mb-10">
+                <input
+                    onChange={hanleInputFilter}
+                    type="text"
+                    placeholder="Search category..."
+                    className="px-5 py-4 border border-gray-300 rounded-lg outline-none"
+                />
+            </div>
             <Table>
                 <thead>
                     <tr>
