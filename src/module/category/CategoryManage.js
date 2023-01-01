@@ -1,6 +1,13 @@
-import { collection, onSnapshot } from "firebase/firestore";
+import {
+    collection,
+    deleteDoc,
+    doc,
+    getDoc,
+    onSnapshot,
+} from "firebase/firestore";
 import React from "react";
 import { useEffect } from "react";
+import Swal from "sweetalert2";
 import { useState } from "react";
 import { ActionDelete, ActionEdit, ActionView } from "~/components/action";
 import { db } from "~/components/firebase/firebase-config";
@@ -24,7 +31,23 @@ const CategoryManage = () => {
             setCategoryList(results);
         });
     }, []);
-    console.log(categoryList);
+    const handleDeleteCategory = (docId) => {
+        const docRef = doc(db, "categories", docId);
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!",
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                await deleteDoc(docRef);
+                Swal.fire("Deleted!", "Your file has been deleted.", "success");
+            }
+        });
+    };
     return (
         <div>
             <DashboardHeading
@@ -70,7 +93,13 @@ const CategoryManage = () => {
                                     <div className="flex items-center gap-x-3">
                                         <ActionView></ActionView>
                                         <ActionEdit></ActionEdit>
-                                        <ActionDelete></ActionDelete>
+                                        <ActionDelete
+                                            onClick={() =>
+                                                handleDeleteCategory(
+                                                    category.id
+                                                )
+                                            }
+                                        ></ActionDelete>
                                     </div>
                                 </td>
                             </tr>
