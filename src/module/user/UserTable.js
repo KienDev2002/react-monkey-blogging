@@ -3,30 +3,17 @@ import { collection, deleteDoc, doc, onSnapshot } from "firebase/firestore";
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import { ActionDelete, ActionEdit } from "~/components/action";
+import { Button } from "~/components/button";
 import { db } from "~/components/firebase/firebase-config";
 import { LabelStatus } from "~/components/label";
 import { Table } from "~/components/table";
 import { userRole, userStatus } from "~/utils/constants";
 
-const UserTable = () => {
-    const [userList, setUserList] = useState();
+const UserTable = ({ totalUser, userList, onClick }) => {
     const navigate = useNavigate();
-    useEffect(() => {
-        const colRef = collection(db, "users");
-        onSnapshot(colRef, (snapshot) => {
-            const results = [];
-            snapshot.forEach((doc) => {
-                results.push({
-                    id: doc.id,
-                    ...doc.data(),
-                });
-            });
-            setUserList(results);
-        });
-    }, []);
+
     const renderLabelStatus = (status) => {
         switch (status) {
             case userStatus.ACTIVE:
@@ -138,6 +125,11 @@ const UserTable = () => {
                         ))}
                 </tbody>
             </Table>
+            {userList.length < totalUser && (
+                <Button onClick={onClick} className="mx-auto h-[250px] mt-10">
+                    Load more
+                </Button>
+            )}
         </div>
     );
 };
