@@ -11,7 +11,10 @@ import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 import { useSearchParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import { Button } from "~/components/button";
 import { Radio } from "~/components/checkbox";
 import { Dropdown, List, Option, Select } from "~/components/dropdown";
@@ -28,6 +31,7 @@ import DashboardHeading from "../dashboard/DashboardHeading";
 const PostUpdate = () => {
     const [params] = useSearchParams();
     const postId = params.get("id");
+    const [content, setContent] = useState("");
     const {
         control,
         reset,
@@ -59,8 +63,12 @@ const PostUpdate = () => {
         handleResetUpload,
     } = useFirebaseImage(setValue, getValues, image_name, deleteAvatar);
 
-    const HandeUpdatePost = (values) => {
-        console.log(values);
+    const HandeUpdatePost = async (values) => {
+        const docRef = doc(db, "posts", postId);
+        await updateDoc(docRef, {
+            content,
+        });
+        toast.success("update post successfully");
     };
     useEffect(() => {
         async function fetchData() {
@@ -171,7 +179,18 @@ const PostUpdate = () => {
                         )}
                     </Field>
                 </div>
-                <div className="mb-10">Content</div>
+                <div className="mb-10">
+                    <Field>
+                        <Label>Content</Label>
+                        <div className="w-full entry-content">
+                            <ReactQuill
+                                theme="snow"
+                                value={content}
+                                onChange={setContent}
+                            />
+                        </div>
+                    </Field>
+                </div>
                 <div className="grid grid-cols-2 mb-10 gap-x-10">
                     <Field>
                         <Label>Feature post</Label>
@@ -222,7 +241,7 @@ const PostUpdate = () => {
                     isLoading={isSubmitting}
                     disabled={isSubmitting}
                 >
-                    Add new post
+                    Update post
                 </Button>
             </form>
         </div>

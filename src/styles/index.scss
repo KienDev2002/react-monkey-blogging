@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 @import url(_reset.scss);
+@import url(_content.scss);
 
 body {
     line-height: 1.5;
