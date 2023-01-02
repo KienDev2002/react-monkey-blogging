@@ -31,20 +31,32 @@ const UserUpdate = () => {
     const watchRoles = watch("role");
     const watchStatus = watch("status");
     const imageURL = getValues("avatar");
+    const imageRegex = imageURL && /%2F(\S+)\?/gm.exec(imageURL);
+    const image_name = imageRegex && imageRegex[1];
+
+    const deleteAvatar = async () => {
+        const docRef = doc(db, "users", userId);
+        await updateDoc(docRef, {
+            avatar: "",
+        });
+    };
 
     const {
         image,
+        setImage,
         progress,
         handleSelectImage,
         handleDeleteImage,
         handleResetUpload,
-    } = useFirebaseImage(setValue, getValues);
-    const handleCreateUser = async (values) => {
+    } = useFirebaseImage(setValue, getValues, image_name, deleteAvatar);
+
+    const handleUpadateUser = async (values) => {
         if (!isValid) return;
         try {
             const docRef = doc(db, "users", userId);
             await updateDoc(docRef, {
                 ...values,
+                avatar: image,
             });
             toast.success("Update user information successfully!");
         } catch (error) {
@@ -52,6 +64,10 @@ const UserUpdate = () => {
             toast.error("Update user information failed!");
         }
     };
+
+    useEffect(() => {
+        setImage(imageURL);
+    }, [imageURL, setImage]);
     useEffect(() => {
         if (!userId) return;
         async function fetchData() {
@@ -69,10 +85,10 @@ const UserUpdate = () => {
                 title="Update user"
                 desc="Update user information"
             ></DashboardHeading>
-            <form onSubmit={handleSubmit(handleCreateUser)}>
+            <form onSubmit={handleSubmit(handleUpadateUser)}>
                 <div className="w-[200px] h-[200px] mx-auto rounded-full mb-10">
                     <ImageUpload
-                        image={imageURL}
+                        image={image}
                         progress={progress}
                         onChange={handleSelectImage}
                         handleDeleteImage={handleDeleteImage}
