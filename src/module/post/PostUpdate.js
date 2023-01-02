@@ -11,7 +11,8 @@ import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import ReactQuill from "react-quill";
+import ImageUploader from "quill-image-uploader";
+import ReactQuill, { Quill } from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -27,6 +28,10 @@ import Toggle from "~/components/toggle/Toggle";
 import useFirebaseImage from "~/hooks/useFireBaseImage";
 import { postStatus } from "~/utils/constants";
 import DashboardHeading from "../dashboard/DashboardHeading";
+import { useMemo } from "react";
+import axios from "axios";
+
+Quill.register("modules/imageUploader", ImageUploader);
 
 const PostUpdate = () => {
     const [params] = useSearchParams();
@@ -39,7 +44,7 @@ const PostUpdate = () => {
         watch,
         setValue,
         getValues,
-        formState: { isSubmitting },
+        formState: { isSubmitting, isValid },
     } = useForm({
         mode: "onChange",
         defaultValues: {},
@@ -64,8 +69,11 @@ const PostUpdate = () => {
     } = useFirebaseImage(setValue, getValues, image_name, deleteAvatar);
 
     const HandeUpdatePost = async (values) => {
+        if (!isValid) return;
         const docRef = doc(db, "posts", postId);
         await updateDoc(docRef, {
+            ...values,
+            image,
             content,
         });
         toast.success("update post successfully");
@@ -77,6 +85,7 @@ const PostUpdate = () => {
             console.log(singleDoc.data());
             reset(singleDoc.data());
             setSelectCategory(singleDoc.data()?.category || "");
+            setContent(singleDoc.data()?.content || "");
         }
         fetchData();
     }, [postId, reset]);
@@ -112,6 +121,36 @@ const PostUpdate = () => {
         });
         setSelectCategory(item);
     };
+
+    const modules = useMemo(
+        () => ({
+            toolbar: [
+                ["bold", "italic", "underline", "strike"],
+                ["blockquote"],
+                [{ header: 1 }, { header: 2 }], // custom button values
+                [{ list: "ordered" }, { list: "bullet" }],
+                [{ header: [1, 2, 3, 4, 5, 6, false] }],
+                ["link", "image"],
+            ],
+            imageUploader: {
+                // imgbbAPI
+                upload: async (file) => {
+                    const bodyFormData = new FormData();
+                    bodyFormData.append("image", file);
+                    const response = await axios({
+                        method: "post",
+                        url: "https://api.imgbb.com/1/upload?key=63e6cd3f1f92682cb805d54a8f2cbd96",
+                        data: bodyFormData,
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                        },
+                    });
+                    return response.data.data.url;
+                },
+            },
+        }),
+        []
+    );
 
     if (!postId) return;
     return (
@@ -187,6 +226,7 @@ const PostUpdate = () => {
                                 theme="snow"
                                 value={content}
                                 onChange={setContent}
+                                modules={modules}
                             />
                         </div>
                     </Field>
@@ -208,7 +248,9 @@ const PostUpdate = () => {
                                 checked={
                                     Number(watchStatus) === postStatus.APPROVED
                                 }
-                                value={postStatus.APPROVED}
+                                onChange={() =>
+                                    setValue("status", postStatus.APPROVED)
+                                }
                             >
                                 Approved
                             </Radio>
@@ -218,7 +260,9 @@ const PostUpdate = () => {
                                 checked={
                                     Number(watchStatus) === postStatus.PENDING
                                 }
-                                value={postStatus.PENDING}
+                                onChange={() =>
+                                    setValue("status", postStatus.PENDING)
+                                }
                             >
                                 Pending
                             </Radio>
@@ -228,7 +272,9 @@ const PostUpdate = () => {
                                 checked={
                                     Number(watchStatus) === postStatus.REJECTED
                                 }
-                                value={postStatus.REJECTED}
+                                onChange={() =>
+                                    setValue("status", postStatus.REJECTED)
+                                }
                             >
                                 Reject
                             </Radio>

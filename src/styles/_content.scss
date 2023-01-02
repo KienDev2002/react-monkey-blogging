@@ -2,6 +2,10 @@
 .entry-content .ql-snow .ql-editor {
     font-family: "Poppins", sans-serif;
     font-size: 16px;
+    h1 {
+        font-size: 40px;
+    }
+
     h2,
     h3,
     h4 {
@@ -33,6 +37,25 @@
         font-style: italic;
         font-size: 14px;
         color: #6b6b6b;
+    }
+    ul {
+        list-style: disc;
+    }
+    ol {
+        list-style: decimal;
+    }
+    ul,
+    ol {
+        margin-bottom: 20px;
+        padding-left: 40px;
+        margin-left: 0;
+        li {
+            margin-bottom: 10px;
+        }
+    }
+    img {
+        border-radius: 8px;
+        margin-bottom: 30px;
     }
     @media screen and (max-width: 1023.98px) {
         font-size: 14px;

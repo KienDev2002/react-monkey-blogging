@@ -96,7 +96,7 @@ const PostDetailsPage = () => {
     }, [slug]);
     console.log(postInfo);
     if (!postInfo.title) return null;
-    if (!slug) return <NotFoundPage></NotFoundPage>;
+    if (!slug || !postInfo.title) return <NotFoundPage></NotFoundPage>;
     return (
         <PostDetailsPageStyles>
             <Layout>
