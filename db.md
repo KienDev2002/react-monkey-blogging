@@ -8,8 +8,8 @@
 -   status: 1(approved) 2(pending) 3(reject)
 -   hot: true,false: post nổi bật
 -   content
--   userId
--   categoryId
+-   user: id, username, fullname, avatar, description
+-   category: id, name, slug
 
 # Category
 

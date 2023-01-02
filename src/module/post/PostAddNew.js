@@ -15,6 +15,8 @@ import { useState } from "react";
 import {
     addDoc,
     collection,
+    doc,
+    getDoc,
     getDocs,
     query,
     serverTimestamp,
@@ -31,7 +33,6 @@ const PostAddNewStyles = styled.div``;
 
 const PostAddNew = () => {
     const { userInfo } = useAuth();
-
     const [loading, setLoading] = useState(false);
     const { control, watch, setValue, handleSubmit, getValues, reset } =
         useForm({
@@ -40,9 +41,10 @@ const PostAddNew = () => {
                 title: "",
                 slug: "",
                 status: 2,
-                categoryId: "",
+                category: {},
                 hot: false,
                 image: "",
+                user: {},
             },
         });
 
@@ -69,7 +71,6 @@ const PostAddNew = () => {
                 ...cloneValues,
                 createdAt: serverTimestamp(),
                 image,
-                userId: userInfo.uid,
             });
 
             toast.success("Create new post successfully");
@@ -77,9 +78,10 @@ const PostAddNew = () => {
                 title: "",
                 slug: "",
                 status: 2,
-                categoryId: "",
+                category: {},
                 hot: false,
                 image: "",
+                user: {},
             });
             handleResetUpload();
             setSelectCategory({});
@@ -113,9 +115,33 @@ const PostAddNew = () => {
         document.title = "Monkey Blogging - Add new post ";
     }, []);
 
+    useEffect(() => {
+        async function fetchData() {
+            if (!userInfo.email) return;
+            const q = query(
+                collection(db, "users"),
+                where("email", "==", userInfo.email)
+            );
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach((doc) => {
+                setValue("user", {
+                    id: doc.id,
+                    ...doc.data(),
+                });
+            });
+        }
+        fetchData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [userInfo.email]);
+
     const [selectCategory, setSelectCategory] = useState("");
-    const handleClickOption = (item) => {
-        setValue("categoryId", item.id);
+    const handleClickOption = async (item) => {
+        const docRef = doc(db, "categories", item.id);
+        const docData = await getDoc(docRef);
+        setValue("category", {
+            id: docData.id,
+            ...docData.data(),
+        });
         setSelectCategory(item);
     };
     return (
