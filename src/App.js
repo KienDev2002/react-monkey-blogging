@@ -17,6 +17,7 @@ import UserManage from "~/module/user/UserManage";
 import UserAddNew from "~/module/user/UserAddNew";
 import UserProfile from "~/module/user/UserProfile";
 import UserUpdate from "./module/user/UserUpdate";
+import PostUpdate from "./module/post/PostUpdate";
 function App() {
     return (
         <AuthProvider>
@@ -47,6 +48,10 @@ function App() {
                     <Route
                         path="/manage/add-post"
                         element={<PostAddNew></PostAddNew>}
+                    ></Route>
+                    <Route
+                        path="/manage/update-post"
+                        element={<PostUpdate></PostUpdate>}
                     ></Route>
                     <Route
                         path="/manage/category"
