@@ -11,6 +11,7 @@ import { db } from "~/components/firebase/firebase-config";
 import ImageUpload from "~/components/image/ImageUpload";
 import { Input } from "~/components/input";
 import { Label } from "~/components/label";
+import { Textarea } from "~/components/textarea";
 import useFirebaseImage from "~/hooks/useFireBaseImage";
 import { userRole, userStatus } from "~/utils/constants";
 import DashboardHeading from "../dashboard/DashboardHeading";
@@ -213,6 +214,14 @@ const UserUpdate = () => {
                                 User
                             </Radio>
                         </FieldCheckboxes>
+                    </Field>
+                    <Field>
+                        <Label>Description</Label>
+                        <Textarea
+                            name="description"
+                            placeholder="Enter your description"
+                            control={control}
+                        ></Textarea>
                     </Field>
                 </div>
                 <Button

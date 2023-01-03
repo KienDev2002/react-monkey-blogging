@@ -15,6 +15,7 @@ import { auth, db } from "~/components/firebase/firebase-config";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import slugify from "slugify";
 import { toast } from "react-toastify";
+import { Textarea } from "~/components/textarea";
 
 const UserAddNew = () => {
     const {
@@ -32,6 +33,7 @@ const UserAddNew = () => {
             email: "",
             password: "",
             username: "",
+            description: "",
             avatar: "",
             status: userStatus.ACTIVE,
             role: userRole.USER,
@@ -67,6 +69,7 @@ const UserAddNew = () => {
                     replacement: " ",
                     trim: true,
                 }),
+                description: values.description,
                 avatar: image,
                 status: Number(values.status),
                 role: Number(values.role),
@@ -81,6 +84,7 @@ const UserAddNew = () => {
                 password: "",
                 username: "",
                 avatar: "",
+                description: "",
                 status: userStatus.ACTIVE,
                 role: userRole.USER,
                 createdAt: new Date(),
@@ -91,6 +95,7 @@ const UserAddNew = () => {
             toast.error("Cannot create new user");
         }
     };
+
     return (
         <div>
             <DashboardHeading
@@ -225,6 +230,14 @@ const UserAddNew = () => {
                                 User
                             </Radio>
                         </FieldCheckboxes>
+                    </Field>
+                    <Field>
+                        <Label>Description</Label>
+                        <Textarea
+                            name="description"
+                            placeholder="Enter your description"
+                            control={control}
+                        ></Textarea>
                     </Field>
                 </div>
                 <Button
