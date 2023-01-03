@@ -18,6 +18,8 @@ import UserAddNew from "~/module/user/UserAddNew";
 import UserProfile from "~/module/user/UserProfile";
 import UserUpdate from "./module/user/UserUpdate";
 import PostUpdate from "./module/post/PostUpdate";
+import CategoryPage from "./pages/CategoryPage";
+import UserPage from "./pages/UserPage";
 function App() {
     return (
         <AuthProvider>
@@ -35,6 +37,14 @@ function App() {
                 <Route
                     path="/:slug"
                     element={<PostDetailsPage></PostDetailsPage>}
+                ></Route>
+                <Route
+                    path="/category/:slug"
+                    element={<CategoryPage></CategoryPage>}
+                ></Route>
+                <Route
+                    path="/user/:slug"
+                    element={<UserPage></UserPage>}
                 ></Route>
                 <Route element={<DashboardLayout></DashboardLayout>}>
                     <Route

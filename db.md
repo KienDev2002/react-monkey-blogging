@@ -26,6 +26,7 @@
 -   username
 -   email
 -   password
+-   description
 -   avatar: url: lấy url , image_name: để xóa ảnh
 -   status: 1(active) 2(pending) 3(ban)
 -   role: 1(Admin) 2(Mod) 3(User)

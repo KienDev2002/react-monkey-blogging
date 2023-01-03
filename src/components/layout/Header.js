@@ -23,6 +23,7 @@ const HeaderStyles = styled.header`
     .header-main {
         display: flex;
         align-items: center;
+        justify-content: space-between;
     }
 
     .logo {
@@ -96,7 +97,7 @@ const Header = () => {
                         ))}
                     </ul>
 
-                    <div className="search">
+                    {/* <div className="search">
                         <input
                             placeholder="Search posts"
                             type="text"
@@ -132,7 +133,7 @@ const Header = () => {
                                 />
                             </svg>
                         </div>
-                    </div>
+                    </div> */}
 
                     {!userInfo ? (
                         <Button

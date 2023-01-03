@@ -1,20 +1,18 @@
-import Heading from "~/components/layout/Heading";
-import Layout from "~/components/layout/Layout";
-import PostCategory from "~/module/post/PostCategory";
-import PostImage from "~/module/post/PostImage";
-import PostItem from "~/module/post/PostItem";
-import PostMeta from "~/module/post/PostMeta";
-import React from "react";
-import parse from "html-react-parser";
 import styled from "styled-components";
-import { useParams, useSearchParams } from "react-router-dom";
+import React from "react";
+import PostRelated from "~/module/post/PostRelated";
+import PostMeta from "~/module/post/PostMeta";
+import PostImage from "~/module/post/PostImage";
+import PostCategory from "~/module/post/PostCategory";
+import parse from "html-react-parser";
 import NotFoundPage from "./NotFoundPage";
-import { useEffect } from "react";
-import { async } from "@firebase/util";
-import { db } from "~/components/firebase/firebase-config";
-import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
-import { useState } from "react";
+import Layout from "~/components/layout/Layout";
 import AuthorBox from "~/components/author/AuthorBox";
+import { useState } from "react";
+import { useParams } from "react-router-dom";
+import { useEffect } from "react";
+import { db } from "~/components/firebase/firebase-config";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 const PostDetailsPageStyles = styled.div`
     padding-bottom: 100px;
     .post {
@@ -95,9 +93,11 @@ const PostDetailsPage = () => {
         }
         fetchData();
     }, [slug]);
-    console.log(postInfo);
+    useEffect(() => {
+        document.body.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, [slug]);
+    if (!slug) return <NotFoundPage></NotFoundPage>;
     if (!postInfo.title) return null;
-    if (!slug || !postInfo.title) return <NotFoundPage></NotFoundPage>;
     return (
         <PostDetailsPageStyles>
             <Layout>
@@ -108,7 +108,10 @@ const PostDetailsPage = () => {
                             className="post-feature"
                         ></PostImage>
                         <div className="post-info">
-                            <PostCategory className="mb-6">
+                            <PostCategory
+                                className="mb-6"
+                                to={postInfo.category.slug}
+                            >
                                 {postInfo.category?.name}
                             </PostCategory>
                             <h1 className="post-heading">{postInfo.title}</h1>
@@ -121,15 +124,9 @@ const PostDetailsPage = () => {
                         </div>
                         <AuthorBox userId={postInfo.user.id}></AuthorBox>
                     </div>
-                    <div className="post-related">
-                        <Heading>Bài viết liên quan</Heading>
-                        <div className="grid-layout grid-layout--primary">
-                            <PostItem></PostItem>
-                            <PostItem></PostItem>
-                            <PostItem></PostItem>
-                            <PostItem></PostItem>
-                        </div>
-                    </div>
+                    <PostRelated
+                        categoryId={postInfo.category.id}
+                    ></PostRelated>
                 </div>
             </Layout>
         </PostDetailsPageStyles>
