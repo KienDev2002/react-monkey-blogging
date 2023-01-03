@@ -16,6 +16,7 @@ import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import slugify from "slugify";
 import { toast } from "react-toastify";
 import { Textarea } from "~/components/textarea";
+import { useAuth } from "~/contexts/auth-context";
 
 const UserAddNew = () => {
     const {

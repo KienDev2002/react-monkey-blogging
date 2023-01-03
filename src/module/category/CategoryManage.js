@@ -18,10 +18,11 @@ import { db } from "~/components/firebase/firebase-config";
 import { LabelStatus } from "~/components/label";
 import { Table } from "~/components/table";
 import DashboardHeading from "~/module/dashboard/DashboardHeading";
-import { catogoryStatus } from "~/utils/constants";
+import { catogoryStatus, userRole } from "~/utils/constants";
 import { useNavigate } from "react-router-dom";
 import { Button } from "~/components/button";
 import { debounce } from "lodash";
+import { useAuth } from "~/contexts/auth-context";
 
 const CATEGORY_PER_PAGE = 1;
 
@@ -109,6 +110,9 @@ const CategoryManage = () => {
     const hanleInputFilter = debounce((e) => {
         setFilter(e.target.value);
     }, 500);
+
+    const { userInfo } = useAuth();
+    if (userInfo.role !== userRole.ADMIN) return null;
     return (
         <div>
             <DashboardHeading title="Categories" desc="Manage your category">

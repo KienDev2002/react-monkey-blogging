@@ -19,8 +19,9 @@ import { useNavigate } from "react-router-dom";
 import { ActionDelete, ActionEdit, ActionView } from "~/components/action";
 import { Button } from "~/components/button";
 import { LabelStatus } from "~/components/label";
-import { postStatus } from "~/utils/constants";
+import { postStatus, userRole } from "~/utils/constants";
 import { debounce } from "lodash";
+import { useAuth } from "~/contexts/auth-context";
 
 const POST_PER_PAGE = 1;
 
@@ -124,6 +125,9 @@ const PostManage = () => {
             documentSnapshots.docs[documentSnapshots.docs.length - 1];
         setLastDoc(lastVisible);
     };
+
+    const { userInfo } = useAuth();
+    if (userInfo.role !== userRole.ADMIN) return null;
 
     return (
         <div>

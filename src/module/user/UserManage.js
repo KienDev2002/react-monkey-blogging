@@ -15,7 +15,9 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { Button } from "~/components/button";
 import { db } from "~/components/firebase/firebase-config";
+import { useAuth } from "~/contexts/auth-context";
 import DashboardHeading from "~/module/dashboard/DashboardHeading";
+import { userRole } from "~/utils/constants";
 import UserTable from "./UserTable";
 
 const USER_PER_PAGE = 2;
@@ -88,6 +90,9 @@ const UserManage = () => {
             documentSnapshots.docs[documentSnapshots.docs.length - 1];
         setLastDoc(lastVisible);
     };
+
+    const { userInfo } = useAuth();
+    if (userInfo.role !== userRole.ADMIN) return null;
 
     return (
         <div>
