@@ -40,7 +40,6 @@ const DashboardHeaderStyles = styled.div`
 
 const DashboardHeader = () => {
     const { userInfo } = useAuth();
-    console.log(userInfo);
     if (!userInfo) return <NotFoundPage></NotFoundPage>;
     return (
         <DashboardHeaderStyles>
