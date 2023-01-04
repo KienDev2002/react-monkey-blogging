@@ -9,7 +9,7 @@ import { useForm } from "react-hook-form";
 import { useAuth } from "~/contexts/auth-context";
 import { useEffect } from "react";
 import useFirebaseImage from "~/hooks/useFireBaseImage";
-import { db } from "~/components/firebase/firebase-config";
+import { auth, db } from "~/components/firebase/firebase-config";
 import {
     collection,
     doc,
@@ -21,6 +21,7 @@ import {
 } from "firebase/firestore";
 import { toast } from "react-toastify";
 import { useState } from "react";
+import { onAuthStateChanged, updatePassword } from "firebase/auth";
 
 const UserProfile = () => {
     const { userInfo } = useAuth();
@@ -31,11 +32,15 @@ const UserProfile = () => {
         setValue,
         getValues,
         handleSubmit,
+        watch,
         formState: { isValid },
     } = useForm({
         mode: "onChange",
         defaultValues: {},
     });
+
+    const watchPassword = watch("password");
+    const watchConfirmPassword = watch("confirmPassword");
 
     const imageURL = userInfo.avatar;
     const imageRegex = imageURL && /%2F(\S+)\?/gm.exec(imageURL);
@@ -68,6 +73,12 @@ const UserProfile = () => {
 
     const handleUpdateUser = async (values) => {
         if (!isValid) return;
+        if (watchPassword !== watchConfirmPassword) {
+            toast.error(
+                "password and confirm Password don't match, enter again please"
+            );
+            return;
+        }
         try {
             const docRef = doc(db, "users", user[0].id);
             await updateDoc(docRef, {
@@ -75,8 +86,10 @@ const UserProfile = () => {
                 birthday: values.birthday,
                 phone: values.phone,
                 password: values.password,
-                confirmPassword: values.confirmPassword,
                 avatar: image,
+            });
+            onAuthStateChanged(auth, (user) => {
+                updatePassword(user, values.password);
             });
             toast.success("Update user information successfully!");
         } catch (error) {
