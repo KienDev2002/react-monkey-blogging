@@ -28,7 +28,6 @@ const PostItemStyles = styled.div`
 `;
 
 const PostItem = ({ data }) => {
-    console.log(data);
     const date = data?.createdAt?.seconds
         ? new Date(data?.createdAt?.seconds * 1000)
         : new Date();

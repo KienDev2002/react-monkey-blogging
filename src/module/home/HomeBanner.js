@@ -1,7 +1,18 @@
 import React from "react";
+import { ErrorBoundary } from "react-error-boundary";
 import styled from "styled-components";
 
 import { Button } from "~/components/button";
+
+function ErrorFallback({ error, resetErrorBoundary }) {
+    return (
+        <div role="alert" className="p-5 bg-red-100">
+            <p className="text-red-600">
+                Không thể lấy data do components bị lỗi
+            </p>
+        </div>
+    );
+}
 
 const HomeBannerStyles = styled.div`
     height: 520px;
@@ -45,9 +56,11 @@ const HomeBanner = () => {
                             Adipisci eveniet facilis unde nulla. Dolore, nemo
                             soluta!
                         </p>
-                        <Button kind="secondary" to="/sign-up">
-                            Get Started
-                        </Button>
+                        <ErrorBoundary FallbackComponent={ErrorFallback}>
+                            <Button kind="secondary" to="/sign-up">
+                                Get Started
+                            </Button>
+                        </ErrorBoundary>
                     </div>
                     <div className="banner-img">
                         <img src="/img-banner.png" alt="" />

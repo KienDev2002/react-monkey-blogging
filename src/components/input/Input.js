@@ -50,9 +50,10 @@ const Input = ({ name = "", type = "", children, control, ...props }) => {
 };
 
 Input.propsTypes = {
-    type: PropTypes.string.isRequired,
+    type: PropTypes.string,
     name: PropTypes.string.isRequired,
     children: PropTypes.node,
+    control: PropTypes.any.isRequired,
 };
 
 export default Input;

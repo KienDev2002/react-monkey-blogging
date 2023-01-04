@@ -21,7 +21,8 @@ const HomeFeature = () => {
         const queries = query(
             colRef,
             limit(3),
-            where("status", "==", 1, where("hot", "==", true))
+            where("status", "==", 1),
+            where("hot", "==", true)
         );
         onSnapshot(queries, (snapShot) => {
             const results = [];
