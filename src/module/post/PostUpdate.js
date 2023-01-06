@@ -14,7 +14,7 @@ import { useForm } from "react-hook-form";
 import ImageUploader from "quill-image-uploader";
 import ReactQuill, { Quill } from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Button } from "~/components/button";
 import { Radio } from "~/components/checkbox";
@@ -30,10 +30,14 @@ import { postStatus } from "~/utils/constants";
 import DashboardHeading from "../dashboard/DashboardHeading";
 import { useMemo } from "react";
 import axios from "axios";
+import slugify from "slugify";
+import { useAuth } from "~/contexts/auth-context";
 
 Quill.register("modules/imageUploader", ImageUploader);
 
 const PostUpdate = () => {
+    const navigate = useNavigate();
+    const { userInfo } = useAuth();
     const [params] = useSearchParams();
     const postId = params.get("id");
     const [content, setContent] = useState("");
@@ -70,22 +74,71 @@ const PostUpdate = () => {
 
     const HandeUpdatePost = async (values) => {
         if (!isValid) return;
-        const docRef = doc(db, "posts", postId);
-        await updateDoc(docRef, {
-            ...values,
-            image,
-            content,
+        // const docRef = doc(db, "posts", postId);
+        // await updateDoc(docRef, {
+        //     ...values,
+        //     image,
+        //     content,
+        // });
+        const cloneValues = { ...values };
+        cloneValues.slug = slugify(values.slug || values.title, {
+            lower: true,
+            replacement: "-",
+            trim: true,
         });
-        toast.success("update post successfully");
+        cloneValues.status = Number(values.status);
+        const data = {
+            title: values.title,
+            slug: cloneValues.slug,
+            image,
+            category: values.category,
+            status: cloneValues.status,
+            hot: values.hot,
+            content,
+            user: {
+                fullname: userInfo.fullname,
+                email: userInfo.email,
+                password: userInfo.password,
+                username: userInfo.username,
+                avatar: userInfo.avatar,
+                status: userInfo.status,
+                role: userInfo.role,
+                description: userInfo.description,
+                createdAt: userInfo.createdAt,
+            },
+        };
+
+        const formDataJsonString = JSON.stringify(data);
+
+        const fetchOptions = {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: formDataJsonString,
+        };
+
+        const response = await fetch(
+            `http://127.0.0.1:5001/monkey-bloging-17bb9/us-central1/app/posts/update/${postId}`,
+            fetchOptions
+        );
+
+        if (!response.ok) {
+            const errorMessage = await response.text();
+            throw new Error(errorMessage);
+        }
+        toast.success("Update post successfully");
+        navigate("/manage/post");
     };
     useEffect(() => {
         async function fetchData() {
-            const docRef = doc(db, "posts", postId);
-            const singleDoc = await getDoc(docRef);
-            console.log(singleDoc.data());
-            reset(singleDoc.data());
-            setSelectCategory(singleDoc.data()?.category || "");
-            setContent(singleDoc.data()?.content || "");
+            const response = await axios(
+                `http://127.0.0.1:5001/monkey-bloging-17bb9/us-central1/app/api/posts/${postId}`
+            );
+            reset(response.data.data);
+            setSelectCategory(response.data.data?.category || "");
+            setContent(response.data.data?.content || "");
         }
         fetchData();
     }, [postId, reset]);
@@ -97,28 +150,19 @@ const PostUpdate = () => {
     const [categories, setCategories] = useState([]);
     useEffect(() => {
         async function getData() {
-            const colRef = collection(db, "categories");
-            const q = query(colRef, where("status", "==", 1));
-            const querySnapshot = await getDocs(q);
-            let results = [];
-            querySnapshot.forEach((doc) => {
-                results.push({
-                    id: doc.id,
-                    ...doc.data(),
-                });
-            });
-            setCategories(results);
+            const response = await axios(
+                "http://127.0.0.1:5001/monkey-bloging-17bb9/us-central1/app/api/categories"
+            );
+            setCategories(response.data.data);
         }
         getData();
     }, []);
     const [selectCategory, setSelectCategory] = useState("");
     const handleClickOption = async (item) => {
-        const docRef = doc(db, "categories", item.id);
-        const docData = await getDoc(docRef);
-        setValue("category", {
-            id: docData.id,
-            ...docData.data(),
-        });
+        const response = await axios(
+            `http://127.0.0.1:5001/monkey-bloging-17bb9/us-central1/app/api/categories/${item.id}`
+        );
+        setValue("category", response.data.data);
         setSelectCategory(item);
     };
 

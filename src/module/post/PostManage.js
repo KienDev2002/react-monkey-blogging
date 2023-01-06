@@ -22,6 +22,7 @@ import { LabelStatus } from "~/components/label";
 import { postStatus, userRole } from "~/utils/constants";
 import { debounce } from "lodash";
 import { useAuth } from "~/contexts/auth-context";
+import axios from "axios";
 
 const POST_PER_PAGE = 1;
 
@@ -34,40 +35,41 @@ const PostManage = () => {
 
     useEffect(() => {
         async function fetchData() {
-            const colRef = collection(db, "posts");
-            onSnapshot(colRef, (snapshot) => {
-                setTotalPost(snapshot.size);
-            });
-            const newRef = filter
-                ? query(
-                      colRef,
-                      where("title", ">=", filter),
-                      where("title", "<=", filter + "utf8")
-                  )
-                : query(colRef, limit(POST_PER_PAGE));
-            const documentSnapshots = await getDocs(newRef);
-
-            // Get the last visible document
-            const lastVisible =
-                documentSnapshots.docs[documentSnapshots.docs.length - 1];
-
-            setLastDoc(lastVisible);
-            onSnapshot(newRef, (snapshot) => {
-                const results = [];
-                snapshot.forEach((doc) => {
-                    results.push({
-                        id: doc.id,
-                        ...doc.data(),
-                    });
-                });
-                setPostList(results);
-            });
+            const response = await axios(
+                "http://127.0.0.1:5001/monkey-bloging-17bb9/us-central1/app/api/posts"
+            );
+            setPostList(response.data.data);
+            // const colRef = collection(db, "posts");
+            // onSnapshot(colRef, (snapshot) => {
+            //     setTotalPost(snapshot.size);
+            // });
+            // const newRef = filter
+            //     ? query(
+            //           colRef,
+            //           where("title", ">=", filter),
+            //           where("title", "<=", filter + "utf8")
+            //       )
+            //     : query(colRef, limit(POST_PER_PAGE));
+            // const documentSnapshots = await getDocs(newRef);
+            // // Get the last visible document
+            // const lastVisible =
+            //     documentSnapshots.docs[documentSnapshots.docs.length - 1];
+            // setLastDoc(lastVisible);
+            // onSnapshot(newRef, (snapshot) => {
+            //     const results = [];
+            //     snapshot.forEach((doc) => {
+            //         results.push({
+            //             id: doc.id,
+            //             ...doc.data(),
+            //         });
+            //     });
+            //     setPostList(results);
+            // });
         }
         fetchData();
-    }, [filter]);
+    }, []);
 
     const handleDeletePost = async (postId) => {
-        const docRef = doc(db, "posts", postId);
         Swal.fire({
             title: "Are you sure?",
             text: "You won't be able to revert this!",
@@ -78,7 +80,17 @@ const PostManage = () => {
             confirmButtonText: "Yes, delete it!",
         }).then(async (result) => {
             if (result.isConfirmed) {
-                await deleteDoc(docRef);
+                await fetch(
+                    `http://127.0.0.1:5001/monkey-bloging-17bb9/us-central1/app/posts/delete/${postId}`,
+                    {
+                        method: "DELETE",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: null,
+                    }
+                );
+
                 Swal.fire("Deleted!", "Your post has been deleted.", "success");
             }
         });
@@ -127,8 +139,8 @@ const PostManage = () => {
     };
 
     const { userInfo } = useAuth();
-    if (userInfo.role !== userRole.ADMIN) return null;
-
+    // if (userInfo.role !== userRole.ADMIN) return null;
+    if (!postList) return;
     return (
         <div>
             <h1 className="dashboard-heading">Manage post</h1>
@@ -157,9 +169,7 @@ const PostManage = () => {
                     {postList.length > 0 &&
                         postList.map((post) => (
                             <tr key={post.id}>
-                                <td title={post.id}>
-                                    {post.id.slice(0, 5) + "..."}
-                                </td>
+                                <td title={post.id}>{post.id}</td>
                                 <td>
                                     <div className="flex items-center gap-x-3">
                                         <img
@@ -174,10 +184,9 @@ const PostManage = () => {
                                             </h3>
                                             <time className="text-sm text-gray-500">
                                                 Date:
-                                                {post?.createdAt?.seconds &&
+                                                {post?.createdAt &&
                                                     new Date(
                                                         post.createdAt
-                                                            ?.seconds * 1000
                                                     ).toLocaleDateString(
                                                         "vi-VI"
                                                     )}
@@ -192,7 +201,7 @@ const PostManage = () => {
                                 </td>
                                 <td>
                                     <span className="text-gray-500">
-                                        {post.user.username}
+                                        {post?.user?.username}
                                     </span>
                                 </td>
                                 <td>{renderPostStatus(post.status)}</td>
