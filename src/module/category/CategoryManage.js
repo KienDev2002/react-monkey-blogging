@@ -23,6 +23,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "~/components/button";
 import { debounce } from "lodash";
 import { useAuth } from "~/contexts/auth-context";
+import axios from "axios";
 
 const CATEGORY_PER_PAGE = 1;
 
@@ -59,39 +60,42 @@ const CategoryManage = () => {
     };
     useEffect(() => {
         async function fetchData() {
-            const colRef = collection(db, "categories");
-            onSnapshot(colRef, (snapshot) => {
-                setTotalCategory(snapshot.size);
-            });
-            const newRef = filter
-                ? query(
-                      colRef,
-                      where("name", ">=", filter),
-                      where("name", "<=", filter + "utf8")
-                  )
-                : query(colRef, limit(CATEGORY_PER_PAGE));
-            const documentSnapshots = await getDocs(newRef);
+            const response = await axios(
+                "http://127.0.0.1:5001/monkey-bloging-17bb9/us-central1/app/api/categories"
+            );
+            setCategoryList(response.data.data);
+            // const colRef = collection(db, "categories");
+            // onSnapshot(colRef, (snapshot) => {
+            //     setTotalCategory(snapshot.size);
+            // });
+            // const newRef = filter
+            //     ? query(
+            //           colRef,
+            //           where("name", ">=", filter),
+            //           where("name", "<=", filter + "utf8")
+            //       )
+            //     : query(colRef, limit(CATEGORY_PER_PAGE));
+            // const documentSnapshots = await getDocs(newRef);
 
-            // Get the last visible document
-            const lastVisible =
-                documentSnapshots.docs[documentSnapshots.docs.length - 1];
+            // // Get the last visible document
+            // const lastVisible =
+            //     documentSnapshots.docs[documentSnapshots.docs.length - 1];
 
-            setLastDoc(lastVisible);
-            onSnapshot(newRef, (snapshot) => {
-                const results = [];
-                snapshot.forEach((doc) => {
-                    results.push({
-                        id: doc.id,
-                        ...doc.data(),
-                    });
-                });
-                setCategoryList(results);
-            });
+            // setLastDoc(lastVisible);
+            // onSnapshot(newRef, (snapshot) => {
+            //     const results = [];
+            //     snapshot.forEach((doc) => {
+            //         results.push({
+            //             id: doc.id,
+            //             ...doc.data(),
+            //         });
+            //     });
+            //     setCategoryList(results);
+            // });
         }
         fetchData();
     }, [filter]);
-    const handleDeleteCategory = (docId) => {
-        const docRef = doc(db, "categories", docId);
+    const handleDeleteCategory = (categoryId) => {
         Swal.fire({
             title: "Are you sure?",
             text: "You won't be able to revert this!",
@@ -102,8 +106,22 @@ const CategoryManage = () => {
             confirmButtonText: "Yes, delete it!",
         }).then(async (result) => {
             if (result.isConfirmed) {
-                await deleteDoc(docRef);
-                Swal.fire("Deleted!", "Your file has been deleted.", "success");
+                await fetch(
+                    `http://127.0.0.1:5001/monkey-bloging-17bb9/us-central1/app/categories/delete/${categoryId}`,
+                    {
+                        method: "DELETE",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: null,
+                    }
+                );
+
+                Swal.fire(
+                    "Deleted!",
+                    "Your category has been deleted.",
+                    "success"
+                );
             }
         });
     };
@@ -112,7 +130,7 @@ const CategoryManage = () => {
     }, 500);
 
     const { userInfo } = useAuth();
-    if (userInfo.role !== userRole.ADMIN) return null;
+    // if (userInfo.role !== userRole.ADMIN) return null;
     return (
         <div>
             <DashboardHeading title="Categories" desc="Manage your category">
@@ -165,7 +183,13 @@ const CategoryManage = () => {
                                 </td>
                                 <td>
                                     <div className="flex items-center gap-x-3">
-                                        <ActionView></ActionView>
+                                        <ActionView
+                                            onClick={() =>
+                                                navigate(
+                                                    `/category/${category.slug}`
+                                                )
+                                            }
+                                        ></ActionView>
                                         <ActionEdit
                                             onClick={() =>
                                                 navigate(

@@ -1,3 +1,4 @@
+import axios from "axios";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -32,19 +33,45 @@ const CategoryUpdate = () => {
 
     useEffect(() => {
         async function fetchData() {
-            const docRef = doc(db, "categories", categoryId);
-            const singleDoc = await getDoc(docRef);
-            reset(singleDoc.data());
+            const response = await axios(
+                `http://127.0.0.1:5001/monkey-bloging-17bb9/us-central1/app/api/categories/${categoryId}`
+            );
+            reset(response.data.data);
         }
         fetchData();
     }, [categoryId, reset]);
     const hanleUpdateCategory = async (values) => {
-        const docRef = doc(db, "categories", categoryId);
-        await updateDoc(docRef, {
-            title: values.name,
-            slug: slugify(values.slug || values.name, { lower: true }),
-            status: values.status,
-        });
+        const data = {
+            name: values.name,
+            slug: slugify(values.slug || values.name, {
+                lower: true,
+                replacement: "-",
+                trim: true,
+            }),
+            status: Number(values.status),
+        };
+
+        const formDataJsonString = JSON.stringify(data);
+
+        const fetchOptions = {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: formDataJsonString,
+        };
+
+        const response = await fetch(
+            `http://127.0.0.1:5001/monkey-bloging-17bb9/us-central1/app/categories/update/${categoryId}`,
+            fetchOptions
+        );
+
+        if (!response.ok) {
+            const errorMessage = await response.text();
+            throw new Error(errorMessage);
+        }
+
         toast.success("Update category successfully!");
         navigate("/manage/category");
     };

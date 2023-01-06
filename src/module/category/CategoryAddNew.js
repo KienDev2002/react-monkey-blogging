@@ -36,14 +36,42 @@ const CategoryAddNew = () => {
         const newValues = { ...values };
         newValues.slug = slugify(newValues.slug || newValues.name, {
             lower: true,
+            replacement: "-",
+            trim: true,
         });
         newValues.status = Number(newValues.status);
-        const colRef = collection(db, "categories");
+        // const colRef = collection(db, "categories");
         try {
-            await addDoc(colRef, {
-                ...newValues,
-                createdAt: serverTimestamp(),
-            });
+            const data = {
+                name: values.name,
+                slug: newValues.slug,
+                status: newValues.status,
+            };
+
+            const formDataJsonString = JSON.stringify(data);
+
+            const fetchOptions = {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+                body: formDataJsonString,
+            };
+
+            const response = await fetch(
+                "http://127.0.0.1:5001/monkey-bloging-17bb9/us-central1/app/categories/create",
+                fetchOptions
+            );
+
+            if (!response.ok) {
+                const errorMessage = await response.text();
+                throw new Error(errorMessage);
+            }
+            // await addDoc(colRef, {
+            //     ...newValues,
+            //     createdAt: serverTimestamp(),
+            // });
             toast.success("Create new category successfully");
         } catch (error) {
             toast.error(error.message);
