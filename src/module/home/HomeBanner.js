@@ -3,6 +3,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import styled from "styled-components";
 
 import { Button } from "~/components/button";
+import { useAuth } from "~/contexts/auth-context";
 
 function ErrorFallback({ error, resetErrorBoundary }) {
     return (
@@ -43,6 +44,7 @@ const HomeBannerStyles = styled.div`
 `;
 
 const HomeBanner = () => {
+    const { userInfo } = useAuth();
     return (
         <HomeBannerStyles>
             <div className="container">
@@ -50,16 +52,21 @@ const HomeBanner = () => {
                     <div className="banner-content">
                         <h1 className="banner-heading">Monkey Blogging</h1>
                         <p className="banner-desc">
-                            Lorem ipsum, dolor sit amet consectetur adipisicing
-                            elit. Minus quibusdam consequatur architecto dolores
-                            nostrum quas, a, eius ad, minima voluptates sunt at!
-                            Adipisci eveniet facilis unde nulla. Dolore, nemo
-                            soluta!
+                            If you've ever read a blog post, that is you
+                            received content from a judicial leader Think of
+                            themselves as experts in their industry. It could be
+                            if blog posts are well written, you will gain useful
+                            knowledge and positive opinions about the writer or
+                            brand that produced the content.
                         </p>
                         <ErrorBoundary FallbackComponent={ErrorFallback}>
-                            <Button kind="secondary" to="/sign-up">
-                                Get Started
-                            </Button>
+                            {userInfo ? (
+                                ""
+                            ) : (
+                                <Button kind="secondary" to="/sign-up">
+                                    Get Started
+                                </Button>
+                            )}
                         </ErrorBoundary>
                     </div>
                     <div className="banner-img">
