@@ -27,47 +27,96 @@ import axios from "axios";
 const POST_PER_PAGE = 1;
 
 const PostManage = () => {
+    const { userInfo } = useAuth();
     const navigate = useNavigate();
     const [postList, setPostList] = useState([]);
+    const [posts, setPosts] = useState({});
     const [filter, setFilter] = useState("");
     const [lastDoc, setLastDoc] = useState();
     const [totalPost, setTotalPost] = useState();
 
     useEffect(() => {
         async function fetchData() {
-            const response = await axios(
-                "http://127.0.0.1:5001/monkey-bloging-17bb9/us-central1/app/api/posts"
-            );
-            setPostList(response.data.data);
-            // const colRef = collection(db, "posts");
-            // onSnapshot(colRef, (snapshot) => {
-            //     setTotalPost(snapshot.size);
-            // });
-            // const newRef = filter
-            //     ? query(
-            //           colRef,
-            //           where("title", ">=", filter),
-            //           where("title", "<=", filter + "utf8")
-            //       )
-            //     : query(colRef, limit(POST_PER_PAGE));
-            // const documentSnapshots = await getDocs(newRef);
-            // // Get the last visible document
-            // const lastVisible =
-            //     documentSnapshots.docs[documentSnapshots.docs.length - 1];
-            // setLastDoc(lastVisible);
-            // onSnapshot(newRef, (snapshot) => {
-            //     const results = [];
-            //     snapshot.forEach((doc) => {
-            //         results.push({
-            //             id: doc.id,
-            //             ...doc.data(),
-            //         });
-            //     });
-            //     setPostList(results);
-            // });
+            if (userInfo?.email === "admin@admin.com") {
+                const colRef = collection(db, "posts");
+                onSnapshot(colRef, (snapshot) => {
+                    setTotalPost(snapshot.size);
+                });
+                const newRef = query(
+                    colRef,
+                    where("title", ">=", filter),
+                    where("title", "<=", filter + "utf8")
+                );
+
+                onSnapshot(newRef, (snapshot) => {
+                    const results = [];
+                    snapshot.forEach((doc) => {
+                        results.push({
+                            id: doc.id,
+                            ...doc.data(),
+                        });
+                    });
+                    setPostList(results);
+                });
+                if (filter === "") {
+                    setFilter("");
+                    const response = await axios(
+                        "http://127.0.0.1:5001/monkey-bloging-17bb9/us-central1/app/api/posts"
+                    );
+                    setPostList(response.data.data);
+                }
+            } else {
+                if (filter !== "") {
+                    const colRef = collection(db, "posts");
+                    onSnapshot(colRef, (snapshot) => {
+                        setTotalPost(snapshot.size);
+                    });
+                    const newRef = query(
+                        colRef,
+                        where("title", ">=", filter),
+                        where("title", "<=", filter + "utf8"),
+                        where("user.email", "==", userInfo.email)
+                    );
+
+                    onSnapshot(newRef, (snapshot) => {
+                        const results = [];
+                        snapshot.forEach((doc) => {
+                            results.push({
+                                id: doc.id,
+                                ...doc.data(),
+                            });
+                        });
+                        setPostList(results);
+                    });
+                    return;
+                }
+                setPostList("");
+                const docRef = query(
+                    collection(db, "posts"),
+                    where("user.email", "==", userInfo.email)
+                );
+                onSnapshot(docRef, (snapshot) => {
+                    const results = [];
+                    snapshot.forEach((doc) => {
+                        results.push({
+                            id: doc.id,
+                            ...doc.data(),
+                        });
+                    });
+                    results.forEach(async (posts) => {
+                        const response = await axios(
+                            `http://127.0.0.1:5001/monkey-bloging-17bb9/us-central1/app/api/posts/${posts.id}`
+                        );
+                        setPostList((prev) => {
+                            const newPost = [...prev, response.data.data];
+                            return newPost;
+                        });
+                    });
+                });
+            }
         }
         fetchData();
-    }, []);
+    }, [filter, userInfo.email]);
 
     const handleDeletePost = async (postId) => {
         Swal.fire({
@@ -113,33 +162,31 @@ const PostManage = () => {
         setFilter(e.target.value);
     }, 500);
 
-    const handleLoadmore = async () => {
-        const nextRef = query(
-            collection(db, "posts"),
-            startAfter(lastDoc || 0),
-            limit(POST_PER_PAGE)
-        );
+    // const handleLoadmore = async () => {
+    //     const nextRef = query(
+    //         collection(db, "posts"),
+    //         startAfter(lastDoc || 0),
+    //         limit(POST_PER_PAGE)
+    //     );
 
-        onSnapshot(nextRef, (snapshot) => {
-            const results = [];
-            snapshot.forEach((doc) => {
-                results.push({
-                    id: doc.id,
-                    ...doc.data(),
-                });
-            });
-            setPostList([...postList, ...results]);
-        });
-        const documentSnapshots = await getDocs(nextRef);
+    //     onSnapshot(nextRef, (snapshot) => {
+    //         const results = [];
+    //         snapshot.forEach((doc) => {
+    //             results.push({
+    //                 id: doc.id,
+    //                 ...doc.data(),
+    //             });
+    //         });
+    //         setPostList([...postList, ...results]);
+    //     });
+    //     const documentSnapshots = await getDocs(nextRef);
 
-        // Get the last visible document
-        const lastVisible =
-            documentSnapshots.docs[documentSnapshots.docs.length - 1];
-        setLastDoc(lastVisible);
-    };
+    //     // Get the last visible document
+    //     const lastVisible =
+    //         documentSnapshots.docs[documentSnapshots.docs.length - 1];
+    //     setLastDoc(lastVisible);
+    // };
 
-    const { userInfo } = useAuth();
-    // if (userInfo.role !== userRole.ADMIN) return null;
     if (!postList) return;
     return (
         <div>
@@ -231,11 +278,11 @@ const PostManage = () => {
                         ))}
                 </tbody>
             </Table>
-            {postList.length < totalPost && (
+            {/* {postList.length < totalPost && (
                 <div className="mt-10 mx-auto w-[250px]">
                     <Button onClick={handleLoadmore}> Load more</Button>
                 </div>
-            )}
+            )} */}
         </div>
     );
 };

@@ -84,16 +84,21 @@ const PostAddNew = () => {
                 hot: values.hot,
                 content,
                 user: {
-                    fullname: userInfo.fullname,
-                    email: userInfo.email,
-                    password: userInfo.password,
-                    username: userInfo.username,
-                    avatar: userInfo.avatar,
-                    status: userInfo.status,
-                    role: userInfo.role,
-                    description: userInfo.description,
-                    createdAt: userInfo.createdAt,
+                    id: userInfo.id || "",
+                    fullname: userInfo.fullname || "admin",
+                    email: userInfo.email || "admin@***",
+                    password: userInfo.password || "********",
+                    username: userInfo.username || "admin",
+                    avatar:
+                        userInfo.avatar ||
+                        "https://tse1.mm.bing.net/th?id=OIP.MMjgXw0k06T087lG4CcNXAHaHa&pid=Api&P=0",
+                    status: userInfo.status || 1,
+                    role: userInfo.role || 1,
+                    description:
+                        userInfo.description || "database administrator",
+                    createdAt: userInfo.createdAt || "***",
                 },
+                comment: "",
             };
 
             const formDataJsonString = JSON.stringify(data);

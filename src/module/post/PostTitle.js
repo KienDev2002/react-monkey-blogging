@@ -7,7 +7,17 @@ const PostTitleStyles = styled.h3`
     line-height: 1.5;
     a {
         display: block;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
+
+    ${(props) =>
+        props.size === "small" &&
+        css`
+            font-size: 1.5rem;
+        `};
     ${(props) =>
         props.size === "normal" &&
         css`
