@@ -34,64 +34,59 @@ const CategoryManage = () => {
     const [lastDoc, setLastDoc] = useState();
     const [totalCategory, setTotalCategory] = useState(0);
 
-    const handleLoadMoreCategory = async () => {
-        const nextRef = query(
-            collection(db, "categories"),
-            startAfter(lastDoc || 0),
-            limit(CATEGORY_PER_PAGE)
-        );
+    // const handleLoadMoreCategory = async () => {
+    //     const nextRef = query(
+    //         collection(db, "categories"),
+    //         startAfter(lastDoc || 0),
+    //         limit(CATEGORY_PER_PAGE)
+    //     );
 
-        onSnapshot(nextRef, (snapshot) => {
-            const results = [];
-            snapshot.forEach((doc) => {
-                results.push({
-                    id: doc.id,
-                    ...doc.data(),
-                });
-            });
-            setCategoryList([...categoryList, ...results]);
-        });
-        const documentSnapshots = await getDocs(nextRef);
+    //     onSnapshot(nextRef, (snapshot) => {
+    //         const results = [];
+    //         snapshot.forEach((doc) => {
+    //             results.push({
+    //                 id: doc.id,
+    //                 ...doc.data(),
+    //             });
+    //         });
+    //         setCategoryList([...categoryList, ...results]);
+    //     });
+    //     const documentSnapshots = await getDocs(nextRef);
 
-        // Get the last visible document
-        const lastVisible =
-            documentSnapshots.docs[documentSnapshots.docs.length - 1];
-        setLastDoc(lastVisible);
-    };
+    //     // Get the last visible document
+    //     const lastVisible =
+    //         documentSnapshots.docs[documentSnapshots.docs.length - 1];
+    //     setLastDoc(lastVisible);
+    // };
     useEffect(() => {
         async function fetchData() {
-            const response = await axios(
-                "http://127.0.0.1:5001/monkey-bloging-17bb9/us-central1/app/api/categories"
+            const colRef = collection(db, "categories");
+            onSnapshot(colRef, (snapshot) => {
+                setTotalCategory(snapshot.size);
+            });
+            const newRef = query(
+                colRef,
+                where("name", ">=", filter),
+                where("name", "<=", filter + "utf8")
             );
-            setCategoryList(response.data.data);
-            // const colRef = collection(db, "categories");
-            // onSnapshot(colRef, (snapshot) => {
-            //     setTotalCategory(snapshot.size);
-            // });
-            // const newRef = filter
-            //     ? query(
-            //           colRef,
-            //           where("name", ">=", filter),
-            //           where("name", "<=", filter + "utf8")
-            //       )
-            //     : query(colRef, limit(CATEGORY_PER_PAGE));
-            // const documentSnapshots = await getDocs(newRef);
 
-            // // Get the last visible document
-            // const lastVisible =
-            //     documentSnapshots.docs[documentSnapshots.docs.length - 1];
-
-            // setLastDoc(lastVisible);
-            // onSnapshot(newRef, (snapshot) => {
-            //     const results = [];
-            //     snapshot.forEach((doc) => {
-            //         results.push({
-            //             id: doc.id,
-            //             ...doc.data(),
-            //         });
-            //     });
-            //     setCategoryList(results);
-            // });
+            onSnapshot(newRef, (snapshot) => {
+                const results = [];
+                snapshot.forEach((doc) => {
+                    results.push({
+                        id: doc.id,
+                        ...doc.data(),
+                    });
+                });
+                setCategoryList(results);
+            });
+            if (filter === "") {
+                setFilter("");
+                const response = await axios(
+                    "http://127.0.0.1:5001/monkey-bloging-17bb9/us-central1/app/api/categories"
+                );
+                setCategoryList(response.data.data);
+            }
         }
         fetchData();
     }, [filter]);
@@ -130,7 +125,7 @@ const CategoryManage = () => {
     }, 500);
 
     const { userInfo } = useAuth();
-    // if (userInfo.role !== userRole.ADMIN) return null;
+    if (userInfo?.email !== "admin@admin.com") return null;
     return (
         <div>
             <DashboardHeading title="Categories" desc="Manage your category">
@@ -210,7 +205,7 @@ const CategoryManage = () => {
                         ))}
                 </tbody>
             </Table>
-            {totalCategory > categoryList.length && (
+            {/* {totalCategory > categoryList.length && (
                 <div className="mt-10">
                     <Button
                         onClick={handleLoadMoreCategory}
@@ -219,7 +214,7 @@ const CategoryManage = () => {
                         Load more
                     </Button>
                 </div>
-            )}
+            )} */}
         </div>
     );
 };

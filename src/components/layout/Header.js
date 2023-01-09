@@ -1,5 +1,6 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { Fragment } from "react";
+import { Link, NavLink } from "react-router-dom";
 import styled from "styled-components";
 import { Button } from "~/components/button";
 import { useAuth } from "~/contexts/auth-context";
@@ -14,8 +15,8 @@ const menuLinks = [
         title: "Blog",
     },
     {
-        url: "/contact",
-        title: "Contact",
+        url: "/feedback",
+        title: "Feedback",
     },
 ];
 const HeaderStyles = styled.header`
@@ -73,13 +74,12 @@ function getLastName(name = "") {
     const length = name.split(" ").length;
     return name.split(" ")[length - 1];
 }
-
 const Header = () => {
     const { userInfo } = useAuth();
     return (
         <HeaderStyles>
             <div className="container">
-                <div className="header-main">
+                <div className=" header-main">
                     <NavLink to={"/"} href="/">
                         <img
                             className="logo"
@@ -90,7 +90,14 @@ const Header = () => {
                     <ul className="menu">
                         {menuLinks.map((item) => (
                             <li className="menu-item" key={item.title}>
-                                <NavLink to={item.url} className="menu-link">
+                                <NavLink
+                                    to={item.url}
+                                    className={({ isActive }) =>
+                                        isActive
+                                            ? "text-green-400 menu-link"
+                                            : "menu-link"
+                                    }
+                                >
                                     {item.title}
                                 </NavLink>
                             </li>
@@ -139,20 +146,46 @@ const Header = () => {
                         <Button
                             className="header-button"
                             height="56px"
-                            to="/sign-up"
+                            to="/sign-in"
                             type="button"
                         >
-                            Sign Up
+                            Sign in
                         </Button>
                     ) : (
-                        <Button
-                            className="header-button"
-                            height="56px"
-                            to="/dashboard"
-                            type="button"
-                        >
-                            Dashboard
-                        </Button>
+                        <div className="flex items-center gap-x-5">
+                            <Button
+                                className="header-button"
+                                height="56px"
+                                to="/dashboard"
+                                type="button"
+                            >
+                                Dashboard
+                            </Button>
+                            <div className="  items-center justify-center border border-gray-300 rounded-full header-avatar inline-flex w-[56px] h-[56px]">
+                                {userInfo?.email !== "admin@admin.com" ? (
+                                    <Link
+                                        to={`/profile?id=${userInfo.id}`}
+                                        className=""
+                                    >
+                                        <img
+                                            className="object-cover rounded-full h-[56px] w-[56px]"
+                                            src={userInfo?.avatar}
+                                            alt=""
+                                        />
+                                    </Link>
+                                ) : (
+                                    <div className="header-avatar">
+                                        <img
+                                            className="object-cover rounded-full"
+                                            src={
+                                                "https://tse1.mm.bing.net/th?id=OIP.MMjgXw0k06T087lG4CcNXAHaHa&pid=Api&P=0"
+                                            }
+                                            alt=""
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     )}
                 </div>
             </div>

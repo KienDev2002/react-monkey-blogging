@@ -42,7 +42,7 @@ const CategoryPage = () => {
         <Layout>
             <div className="container">
                 <div className="pt-10"></div>
-                <Heading>Danh mục {param.slug}</Heading>
+                <Heading>Category {param.slug}</Heading>
                 <div className="grid-layout grid-layout--primary">
                     {posts &&
                         posts.map((post) => (

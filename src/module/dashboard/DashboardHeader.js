@@ -59,9 +59,24 @@ const DashboardHeader = () => {
                 >
                     Write new post
                 </Button>
-                <Link to="/profile" className="header-avatar">
-                    <img src={userInfo?.avatar} alt="" />
-                </Link>
+                {userInfo?.email !== "admin@admin.com" ? (
+                    <Link
+                        to={`/profile?id=${userInfo.id}`}
+                        className="header-avatar"
+                    >
+                        <img src={userInfo?.avatar} alt="" />
+                    </Link>
+                ) : (
+                    <div className="header-avatar">
+                        <img
+                            className="object-cover"
+                            src={
+                                "https://tse1.mm.bing.net/th?id=OIP.MMjgXw0k06T087lG4CcNXAHaHa&pid=Api&P=0"
+                            }
+                            alt=""
+                        />
+                    </div>
+                )}
             </div>
         </DashboardHeaderStyles>
     );
