@@ -14,6 +14,10 @@ function AuthProvider(props) {
     const value = { userInfo, setUserInfo };
     useEffect(() => {
         onAuthStateChanged(auth, (user) => {
+            if (user.email === "admin@admin.com") {
+                setUserInfo(user);
+                return;
+            }
             if (user) {
                 const docRef = query(
                     collection(db, "users"),

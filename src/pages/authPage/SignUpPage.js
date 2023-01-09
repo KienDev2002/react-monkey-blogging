@@ -16,7 +16,7 @@ import AuthenticationPage from "./AuthenticationPage";
 
 import InputPasswordToggle from "~/components/input/InputPasswordToggle";
 import slugify from "slugify";
-import { userRole, userStatus } from "~/utils/constants";
+import { course_API, userRole, userStatus } from "~/utils/constants";
 
 const schema = yup.object({
     fullname: yup.string().required("please enter your fullname"),
@@ -35,6 +35,7 @@ const SignUpPage = () => {
     const {
         control,
         handleSubmit,
+        reset,
         formState: { errors, isValid, isSubmitting },
     } = useForm({ mode: "onChange", resolver: yupResolver(schema) });
 
@@ -45,6 +46,44 @@ const SignUpPage = () => {
             values.email,
             values.password
         );
+
+        const data = {
+            fullname: values.fullname,
+            email: values.email,
+            password: values.password,
+            username: slugify(values.username || values.fullname, {
+                lower: true,
+                replacement: "-",
+                trim: true,
+            }),
+            avatar: "https://tse4.mm.bing.net/th?id=OIP.fpaUV35ECaGkz-YNCrBSwQHaHa&pid=Api&P=0",
+            status: userStatus.ACTIVE,
+            role: userRole.USER,
+            description: "",
+            createdAt: serverTimestamp(),
+        };
+
+        const formDataJsonString = JSON.stringify(data);
+
+        const fetchOptions = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: formDataJsonString,
+        };
+
+        const response = await fetch(
+            "http://127.0.0.1:5001/monkey-bloging-17bb9/us-central1/app/users/create",
+            fetchOptions
+        );
+
+        if (!response.ok) {
+            const errorMessage = await response.text();
+            throw new Error(errorMessage);
+        }
+
         updateProfile(auth.currentUser, {
             displayName: values.fullname,
             photoURL:
@@ -52,22 +91,32 @@ const SignUpPage = () => {
         });
         // const colRef = collection(db, "users");
         // create users in doc có id là id của user in authentication firebase
-        await setDoc(doc(db, "users", auth.currentUser.uid), {
-            fullname: values.fullname,
-            email: values.email,
-            password: values.password,
-            username: slugify(values.fullname, { lower: true }),
-            avatar: "https://tse4.mm.bing.net/th?id=OIP.fpaUV35ECaGkz-YNCrBSwQHaHa&pid=Api&P=0",
-            status: userStatus.ACTIVE,
-            role: userRole.USER,
-            createdAt: serverTimestamp(),
-        });
+        // await setDoc(doc(db, "users", auth.currentUser.uid), {
+        //     fullname: values.fullname,
+        //     email: values.email,
+        //     password: values.password,
+        //     username: slugify(values.fullname, { lower: true }),
+        //     avatar: "https://tse4.mm.bing.net/th?id=OIP.fpaUV35ECaGkz-YNCrBSwQHaHa&pid=Api&P=0",
+        //     status: userStatus.ACTIVE,
+        //     role: userRole.USER,
+        //     createdAt: serverTimestamp(),
+        // });
         // await setDoc(colRef, {
         //     fullname: values.fullname,
         //     email: values.email,
         //     password: values.password,
         // });
         toast.success("Register successfully");
+        reset({
+            fullname: "",
+            email: "",
+            password: "",
+            username: "",
+            avatar: "",
+            status: "",
+            role: "",
+            createdAt: "",
+        });
         navigate("/");
     };
     useEffect(() => {
