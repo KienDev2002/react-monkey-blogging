@@ -35,7 +35,14 @@ const InputStyles = styled.div`
     }
 `;
 
-const Input = ({ name = "", type = "", children, control, ...props }) => {
+const Input = ({
+    name = "",
+    type = "",
+    children,
+    disabled,
+    control,
+    ...props
+}) => {
     const { field } = useController({
         control,
         name,
@@ -43,7 +50,14 @@ const Input = ({ name = "", type = "", children, control, ...props }) => {
     });
     return (
         <InputStyles hasIcon={children ? true : false}>
-            <input id={name} type={type} {...field} {...props}></input>
+            <input
+                className={`${disabled === true ? "opacity-25" : ""} `}
+                id={name}
+                disabled={disabled}
+                type={type}
+                {...field}
+                {...props}
+            ></input>
             {children ? <div className="input-icon">{children}</div> : null}
         </InputStyles>
     );

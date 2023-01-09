@@ -1,7 +1,11 @@
 import React, { Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./contexts/auth-context";
-
+import "swiper/css";
+import BlogPage from "./pages/BlogPage";
+import FeedbackPage from "./pages/FeedbackPage";
+import FeedbackManage from "./module/feedback/FeedbackManage";
+import FeedbackUpdate from "./module/feedback/FeedbackUpdate";
 const HomePage = React.lazy(() => import("~/pages/HomePage"));
 const SignUpPage = React.lazy(() => import("~/pages/authPage/SignUpPage"));
 const SignInPage = React.lazy(() => import("~/pages/authPage/SignInPage"));
@@ -60,6 +64,11 @@ function App() {
                         path="/user/:slug"
                         element={<UserPage></UserPage>}
                     ></Route>
+                    <Route path="/blog" element={<BlogPage></BlogPage>}></Route>
+                    <Route
+                        path="/feedback"
+                        element={<FeedbackPage></FeedbackPage>}
+                    ></Route>
                     <Route element={<DashboardLayout></DashboardLayout>}>
                         <Route
                             path="/dashboard"
@@ -104,6 +113,14 @@ function App() {
                         <Route
                             path="/profile"
                             element={<UserProfile></UserProfile>}
+                        ></Route>
+                        <Route
+                            path="/manage/feedback"
+                            element={<FeedbackManage></FeedbackManage>}
+                        ></Route>
+                        <Route
+                            path="/manage/update-feedback"
+                            element={<FeedbackUpdate></FeedbackUpdate>}
                         ></Route>
                     </Route>
                 </Routes>

@@ -89,3 +89,10 @@ a {
         z-index: 10;
     }
 }
+
+@layer components {
+    .postList .swiper-slide {
+        width: 284px;
+        height: auto;
+    }
+}

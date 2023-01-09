@@ -9,6 +9,7 @@
 -   hot: true,false: post nổi bật
 -   content
 -   user: id, username, fullname, avatar, description
+-   comment
 -   category: id, name, slug
 
 # Category
@@ -22,7 +23,6 @@
 # User
 
 -   id
--   displayName
 -   username
 -   email
 -   password
@@ -30,9 +30,20 @@
 -   avatar: url: lấy url , image_name: để xóa ảnh
 -   status: 1(active) 2(pending) 3(ban)
 -   role: 1(Admin) 2(Mod) 3(User)
--   permissions: "ADD_POST"
 -   createdAt
 
---
+# feedback
 
-Hướng dẫn setup phòng cực chill dành cho người mới toàn tập
+-   id
+-   fullname
+-   email
+-   user
+-   message
+-   createAt
+
+# comment
+
+-   id
+-   textComment
+-   user
+-   created
