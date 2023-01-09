@@ -57,12 +57,12 @@ const PostUpdate = () => {
     const watchStatus = watch("status");
     const imageURL = getValues("image");
     const image_name = getValues("image_name");
-    const deleteAvatar = async () => {
-        const docRef = doc(db, "posts", postId);
-        await updateDoc(docRef, {
-            image: "",
-        });
-    };
+    // const deleteAvatar = async () => {
+    //     const docRef = doc(db, "posts", postId);
+    //     await updateDoc(docRef, {
+    //         image: "",
+    //     });
+    // };
     const {
         image,
         setImage,
@@ -70,7 +70,7 @@ const PostUpdate = () => {
         handleSelectImage,
         handleDeleteImage,
         handleResetUpload,
-    } = useFirebaseImage(setValue, getValues, image_name, deleteAvatar);
+    } = useFirebaseImage(setValue, getValues, image_name);
 
     const HandeUpdatePost = async (values) => {
         if (!isValid) return;

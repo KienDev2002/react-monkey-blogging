@@ -1,13 +1,16 @@
+import axios from "axios";
+import { onAuthStateChanged, updatePassword } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import React from "react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import slugify from "slugify";
 import { Button } from "~/components/button";
 import { Radio } from "~/components/checkbox";
 import { Field, FieldCheckboxes } from "~/components/field";
-import { db } from "~/components/firebase/firebase-config";
+import { auth, db } from "~/components/firebase/firebase-config";
 import ImageUpload from "~/components/image/ImageUpload";
 import { Input } from "~/components/input";
 import { Label } from "~/components/label";
@@ -19,7 +22,7 @@ import DashboardHeading from "../dashboard/DashboardHeading";
 const UserUpdate = () => {
     const [params] = useSearchParams();
     const userId = params.get("id");
-
+    const navigate = useNavigate();
     const {
         control,
         handleSubmit,
@@ -35,12 +38,12 @@ const UserUpdate = () => {
     const imageRegex = imageURL && /%2F(\S+)\?/gm.exec(imageURL);
     const image_name = imageRegex && imageRegex[1];
 
-    const deleteAvatar = async () => {
-        const docRef = doc(db, "users", userId);
-        await updateDoc(docRef, {
-            avatar: "",
-        });
-    };
+    // const deleteAvatar = async () => {
+    //     const docRef = doc(db, "users", userId);
+    //     await updateDoc(docRef, {
+    //         avatar: "",
+    //     });
+    // };
 
     const {
         image,
@@ -49,32 +52,75 @@ const UserUpdate = () => {
         handleSelectImage,
         handleDeleteImage,
         handleResetUpload,
-    } = useFirebaseImage(setValue, getValues, image_name, deleteAvatar);
+    } = useFirebaseImage(setValue, getValues, image_name);
 
     const handleUpadateUser = async (values) => {
-        if (!isValid) return;
         try {
-            const docRef = doc(db, "users", userId);
-            await updateDoc(docRef, {
-                ...values,
-                avatar: image,
+            if (!isValid) return;
+
+            const cloneValues = { ...values };
+            cloneValues.username = slugify(values.username || values.fullname, {
+                lower: true,
+                replacement: "-",
+                trim: true,
             });
+            cloneValues.status = Number(values.status);
+            const data = {
+                fullname: values.fullname,
+                email: values.email,
+                password: values.password,
+                username: cloneValues.username,
+                avatar: image,
+                status: cloneValues.status,
+                role: Number(values.role),
+                description: values.description,
+                dateOfBirth: "",
+                mobileNumber: "",
+            };
+
+            const formDataJsonString = JSON.stringify(data);
+
+            const fetchOptions = {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+                body: formDataJsonString,
+            };
+
+            const response = await fetch(
+                `http://127.0.0.1:5001/monkey-bloging-17bb9/us-central1/app/users/update/${userId}`,
+                fetchOptions
+            );
+
+            if (!response.ok) {
+                const errorMessage = await response.text();
+                throw new Error(errorMessage);
+            }
+            // const docRef = doc(db, "users", userId);
+            // await updateDoc(docRef, {
+            //     ...values,
+            //     avatar: image,
+            // });
+
             toast.success("Update user information successfully!");
+            navigate("/manage/user");
         } catch (error) {
             console.log(error);
             toast.error("Update user information failed!");
         }
     };
-
     useEffect(() => {
         setImage(imageURL);
     }, [imageURL, setImage]);
     useEffect(() => {
         if (!userId) return;
         async function fetchData() {
-            const docRef = doc(db, "users", userId);
-            const docData = await getDoc(docRef);
-            reset(docData.data());
+            const response = await axios(
+                `http://127.0.0.1:5001/monkey-bloging-17bb9/us-central1/app/api/users/${userId}`
+            );
+            reset(response.data.data);
         }
         fetchData();
     }, [reset, userId]);
@@ -127,6 +173,7 @@ const UserUpdate = () => {
                     <Field>
                         <Label>Password</Label>
                         <Input
+                            disabled={true}
                             name="password"
                             placeholder="Enter your password"
                             control={control}

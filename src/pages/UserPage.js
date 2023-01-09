@@ -30,13 +30,12 @@ const UserPage = () => {
         }
         fetchData();
     }, [param.slug]);
-    console.log(posts);
     if (posts.length <= 0) return null;
     return (
         <Layout>
             <div className="container">
                 <div className="pt-10"></div>
-                <Heading>Các bài viết của {param.slug}</Heading>
+                <Heading>{param.slug}'s posts</Heading>
                 <div className="grid-layout grid-layout--primary">
                     {posts &&
                         posts.map((post) => (

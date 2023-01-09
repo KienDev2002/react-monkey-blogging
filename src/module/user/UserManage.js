@@ -1,4 +1,5 @@
 import { async } from "@firebase/util";
+import axios from "axios";
 import {
     collection,
     getDoc,
@@ -38,21 +39,12 @@ const UserManage = () => {
             onSnapshot(colRef, (snapshot) => {
                 setTotalUser(snapshot.size);
             });
+            const newRef = query(
+                colRef,
+                where("username", ">=", filter),
+                where("username", "<=", filter + "utf8")
+            );
 
-            const newRef = filter
-                ? query(
-                      colRef,
-                      where("username", ">=", filter),
-                      where("username", "<=", filter + "utf8")
-                  )
-                : query(colRef, limit(USER_PER_PAGE));
-            const documentSnapshots = await getDocs(newRef);
-
-            // Get the last visible document
-            const lastVisible =
-                documentSnapshots.docs[documentSnapshots.docs.length - 1];
-
-            setLastDoc(lastVisible);
             onSnapshot(newRef, (snapshot) => {
                 const results = [];
                 snapshot.forEach((doc) => {
@@ -63,36 +55,43 @@ const UserManage = () => {
                 });
                 setUserList(results);
             });
+            if (filter === "") {
+                setFilter("");
+                const response = await axios.get(
+                    "http://127.0.0.1:5001/monkey-bloging-17bb9/us-central1/app/api/users"
+                );
+                setUserList(response.data.data);
+            }
         }
         fetchData();
     }, [filter]);
 
-    const handleLoadmoreUser = async () => {
-        const nextRef = query(
-            collection(db, "users"),
-            startAfter(lastDoc || 0),
-            limit(USER_PER_PAGE)
-        );
-        onSnapshot(nextRef, (snapshot) => {
-            const results = [];
-            snapshot.forEach((doc) => {
-                results.push({
-                    id: doc.id,
-                    ...doc.data(),
-                });
-            });
-            setUserList([...userList, ...results]);
-        });
-        const documentSnapshots = await getDocs(nextRef);
+    // const handleLoadmoreUser = async () => {
+    //     const nextRef = query(
+    //         collection(db, "users"),
+    //         startAfter(lastDoc || 0),
+    //         limit(USER_PER_PAGE)
+    //     );
+    //     onSnapshot(nextRef, (snapshot) => {
+    //         const results = [];
+    //         snapshot.forEach((doc) => {
+    //             results.push({
+    //                 id: doc.id,
+    //                 ...doc.data(),
+    //             });
+    //         });
+    //         setUserList([...userList, ...results]);
+    //     });
+    //     const documentSnapshots = await getDocs(nextRef);
 
-        // Get the last visible document
-        const lastVisible =
-            documentSnapshots.docs[documentSnapshots.docs.length - 1];
-        setLastDoc(lastVisible);
-    };
+    //     // Get the last visible document
+    //     const lastVisible =
+    //         documentSnapshots.docs[documentSnapshots.docs.length - 1];
+    //     setLastDoc(lastVisible);
+    // };
 
     const { userInfo } = useAuth();
-    if (userInfo.role !== userRole.ADMIN) return null;
+    if (userInfo?.email !== "admin@admin.com") return null;
 
     return (
         <div>
@@ -113,11 +112,7 @@ const UserManage = () => {
                     />
                 </div>
             </div>
-            <UserTable
-                totalUser={totalUser}
-                onClick={handleLoadmoreUser}
-                userList={userList}
-            ></UserTable>
+            <UserTable totalUser={totalUser} userList={userList}></UserTable>
         </div>
     );
 };

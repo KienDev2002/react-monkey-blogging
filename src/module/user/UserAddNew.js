@@ -60,22 +60,59 @@ const UserAddNew = () => {
                 values.email,
                 values.password
             );
-            const colRef = collection(db, "users");
-            await addDoc(colRef, {
+            // const colRef = collection(db, "users");
+            // await addDoc(colRef, {
+            //     fullname: values.fullname,
+            //     email: values.email,
+            //     password: values.password,
+            //     username: slugify(values.username || values.fullname, {
+            //         lower: true,
+            //         replacement: " ",
+            //         trim: true,
+            //     }),
+            //     description: values.description,
+            //     avatar: image,
+            //     status: Number(values.status),
+            //     role: Number(values.role),
+            //     createdAt: serverTimestamp(),
+            // });
+            const data = {
                 fullname: values.fullname,
                 email: values.email,
                 password: values.password,
                 username: slugify(values.username || values.fullname, {
                     lower: true,
-                    replacement: " ",
+                    replacement: "-",
                     trim: true,
                 }),
-                description: values.description,
-                avatar: image,
+                avatar:
+                    image ||
+                    "https://tse1.mm.bing.net/th?id=OIP.BkoXurD30qD41Q4pDKvDAAHaGH&pid=Api&rs=1&c=1&qlt=95&w=129&h=106",
                 status: Number(values.status),
                 role: Number(values.role),
-                createdAt: serverTimestamp(),
-            });
+                description: values.description,
+            };
+
+            const formDataJsonString = JSON.stringify(data);
+
+            const fetchOptions = {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+                body: formDataJsonString,
+            };
+
+            const response = await fetch(
+                "http://127.0.0.1:5001/monkey-bloging-17bb9/us-central1/app/users/create",
+                fetchOptions
+            );
+
+            if (!response.ok) {
+                const errorMessage = await response.text();
+                throw new Error(errorMessage);
+            }
             toast.success(
                 `Create new user with email: ${values.email} successfully!`
             );

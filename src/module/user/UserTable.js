@@ -39,8 +39,7 @@ const UserTable = ({ totalUser, userList, onClick }) => {
         }
     };
 
-    const handleDeleteUser = async (user) => {
-        const docRef = doc(db, "users", user.id);
+    const handleDeleteUser = async (userId) => {
         Swal.fire({
             title: "Are you sure?",
             text: "You won't be able to revert this!",
@@ -51,9 +50,18 @@ const UserTable = ({ totalUser, userList, onClick }) => {
             confirmButtonText: "Yes, delete it!",
         }).then(async (result) => {
             if (result.isConfirmed) {
-                await deleteDoc(docRef);
-                await deleteUser(user);
-                Swal.fire("Deleted!", "Your file has been deleted.", "success");
+                await fetch(
+                    `http://127.0.0.1:5001/monkey-bloging-17bb9/us-central1/app/users/delete/${userId}`,
+                    {
+                        method: "DELETE",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: null,
+                    }
+                );
+
+                Swal.fire("Deleted!", "Your user has been deleted.", "success");
             }
         });
     };
@@ -76,9 +84,7 @@ const UserTable = ({ totalUser, userList, onClick }) => {
                     {userList.length > 0 &&
                         userList.map((user) => (
                             <tr key={user.id}>
-                                <td title={user.id}>
-                                    {user?.id.slice(0, 5) + "..."}
-                                </td>
+                                <td title={user.id}>{user?.id}</td>
                                 <td className="whitespace-nowrap">
                                     <div className="flex items-center gap-x-3">
                                         <img
@@ -90,8 +96,7 @@ const UserTable = ({ totalUser, userList, onClick }) => {
                                             <h3>{user?.fullname}</h3>
                                             <time className="text-xl text-gray-300">
                                                 {new Date(
-                                                    user?.createdAt?.seconds *
-                                                        1000
+                                                    user?.createdAt
                                                 ).toLocaleDateString("vi-VI")}
                                             </time>
                                         </div>
@@ -116,7 +121,7 @@ const UserTable = ({ totalUser, userList, onClick }) => {
                                         ></ActionEdit>
                                         <ActionDelete
                                             onClick={() =>
-                                                handleDeleteUser(user)
+                                                handleDeleteUser(user.id)
                                             }
                                         ></ActionDelete>
                                     </div>
@@ -125,11 +130,11 @@ const UserTable = ({ totalUser, userList, onClick }) => {
                         ))}
                 </tbody>
             </Table>
-            {userList.length < totalUser && (
+            {/* {userList.length < totalUser && (
                 <Button onClick={onClick} className="mx-auto h-[250px] mt-10">
                     Load more
                 </Button>
-            )}
+            )} */}
         </div>
     );
 };

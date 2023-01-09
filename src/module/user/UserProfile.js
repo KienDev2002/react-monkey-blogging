@@ -22,9 +22,15 @@ import {
 import { toast } from "react-toastify";
 import { useState } from "react";
 import { onAuthStateChanged, updatePassword } from "firebase/auth";
+import axios from "axios";
+import slugify from "slugify";
+import { useSearchParams } from "react-router-dom";
+import { Textarea } from "~/components/textarea";
 
 const UserProfile = () => {
     const { userInfo } = useAuth();
+    const [params] = useSearchParams();
+    const userId = params.get("id");
     const [user, setUser] = useState([]);
     const {
         control,
@@ -46,12 +52,12 @@ const UserProfile = () => {
     const imageRegex = imageURL && /%2F(\S+)\?/gm.exec(imageURL);
     const image_name = imageRegex && imageRegex[1];
 
-    const deleteAvatar = async () => {
-        const docRef = doc(db, "users", user[0].id);
-        await updateDoc(docRef, {
-            avatar: "",
-        });
-    };
+    // const deleteAvatar = async () => {
+    //     const docRef = doc(db, "users", user[0].id);
+    //     await updateDoc(docRef, {
+    //         avatar: "",
+    //     });
+    // };
     const {
         image,
         setImage,
@@ -59,14 +65,17 @@ const UserProfile = () => {
         handleSelectImage,
         handleDeleteImage,
         handleResetUpload,
-    } = useFirebaseImage(setValue, getValues, image_name, deleteAvatar);
+    } = useFirebaseImage(setValue, getValues, image_name);
     useEffect(() => {
-        reset({
-            fullname: userInfo.fullname,
-            username: userInfo.username,
-            email: userInfo.email,
-        });
-    }, [reset, userInfo.email, userInfo.fullname, userInfo.username]);
+        async function fetchData() {
+            const response = await axios(
+                `http://127.0.0.1:5001/monkey-bloging-17bb9/us-central1/app/api/users/${userId}`
+            );
+            reset(response.data.data);
+        }
+        fetchData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     useEffect(() => {
         setImage(imageURL);
     }, [setImage, imageURL]);
@@ -80,14 +89,45 @@ const UserProfile = () => {
             return;
         }
         try {
-            const docRef = doc(db, "users", user[0].id);
-            await updateDoc(docRef, {
-                ...values,
-                birthday: values.birthday,
-                phone: values.phone,
-                password: values.password,
-                avatar: image,
+            const cloneValues = { ...values };
+            cloneValues.username = slugify(values.username || values.fullname, {
+                lower: true,
+                replacement: "-",
+                trim: true,
             });
+            const data = {
+                fullname: values.fullname,
+                email: values.email,
+                password: values.password,
+                username: cloneValues.username,
+                avatar: image,
+                status: userInfo.status,
+                role: userInfo.role,
+                description: values.description,
+                dateOfBirth: values.dateOfBirth,
+                mobileNumber: values.mobileNumber,
+            };
+
+            const formDataJsonString = JSON.stringify(data);
+
+            const fetchOptions = {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+                body: formDataJsonString,
+            };
+
+            const response = await fetch(
+                `http://127.0.0.1:5001/monkey-bloging-17bb9/us-central1/app/users/update/${userId}`,
+                fetchOptions
+            );
+
+            if (!response.ok) {
+                const errorMessage = await response.text();
+                throw new Error(errorMessage);
+            }
             onAuthStateChanged(auth, (user) => {
                 updatePassword(user, values.password);
             });
@@ -119,6 +159,7 @@ const UserProfile = () => {
         fetchData();
     }, [userInfo.email]);
     if (!userInfo) return;
+
     return (
         <div>
             <DashboardHeading
@@ -158,7 +199,7 @@ const UserProfile = () => {
                         <Label>Date of Birth</Label>
                         <Input
                             control={control}
-                            name="birthday"
+                            name="dateOfBirth"
                             placeholder="dd/mm/yyyy"
                         ></Input>
                     </Field>
@@ -166,7 +207,7 @@ const UserProfile = () => {
                         <Label>Mobile Number</Label>
                         <Input
                             control={control}
-                            name="phone"
+                            name="mobileNumber"
                             placeholder="Enter your phone number"
                         ></Input>
                     </Field>
@@ -175,6 +216,7 @@ const UserProfile = () => {
                     <Field>
                         <Label>Email</Label>
                         <Input
+                            disabled={true}
                             control={control}
                             name="email"
                             type="email"
@@ -201,6 +243,15 @@ const UserProfile = () => {
                             type="password"
                             placeholder="Enter your confirm password"
                         ></Input>
+                    </Field>
+                    <Field>
+                        <Label>Description</Label>
+                        <Textarea
+                            control={control}
+                            name="description"
+                            type="description"
+                            placeholder="Enter your description"
+                        ></Textarea>
                     </Field>
                 </div>
                 <Button
