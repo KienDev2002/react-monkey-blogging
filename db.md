@@ -3,14 +3,7 @@
     - Frontend: HTML - SCSS - tailwind css - JS -  ReactJS(router, yup, react hook form)
     - Backend:
         + Create database bằng firebase
-        + Built REST API với firebase clound functions, firestore và expressJS (call API để CRUD database)
-            + setting up firebase
-            + viết clound fun đầu tiên
-                +  cloud functions ở local ta chạy command: npm run serve
-            + Kết hợp Express để xây dựng REST API
-                +  Tạo account service cho app: Để truy cập vào Firestore và admin tool từ app, ta cần phải tạo 1 service account
-                +  Cấu hình firebase admin
-            + Xây dựng controller để nhận http request, thao tác với firestore
+        + Built REST API với firebase clound functions, firestore và expressJS (call API, có 4 tác vụ chính CRUD database)
 
 <!-- Chức năng -->
 
