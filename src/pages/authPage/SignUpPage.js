@@ -41,83 +41,87 @@ const SignUpPage = () => {
 
     const hanleSignUp = async (values) => {
         if (!isValid) return;
-        await createUserWithEmailAndPassword(
-            auth,
-            values.email,
-            values.password
-        );
+        try {
+            await createUserWithEmailAndPassword(
+                auth,
+                values.email,
+                values.password
+            );
 
-        const data = {
-            fullname: values.fullname,
-            email: values.email,
-            password: values.password,
-            username: slugify(values.username || values.fullname, {
-                lower: true,
-                replacement: "-",
-                trim: true,
-            }),
-            avatar: "https://tse4.mm.bing.net/th?id=OIP.fpaUV35ECaGkz-YNCrBSwQHaHa&pid=Api&P=0",
-            status: userStatus.ACTIVE,
-            role: userRole.USER,
-            description: "",
-            createdAt: serverTimestamp(),
-        };
+            const data = {
+                fullname: values.fullname,
+                email: values.email,
+                password: values.password,
+                username: slugify(values.username || values.fullname, {
+                    lower: true,
+                    replacement: "-",
+                    trim: true,
+                }),
+                avatar: "https://tse4.mm.bing.net/th?id=OIP.fpaUV35ECaGkz-YNCrBSwQHaHa&pid=Api&P=0",
+                status: userStatus.ACTIVE,
+                role: userRole.USER,
+                description: "",
+                createdAt: serverTimestamp(),
+            };
 
-        const formDataJsonString = JSON.stringify(data);
+            const formDataJsonString = JSON.stringify(data);
 
-        const fetchOptions = {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json",
-            },
-            body: formDataJsonString,
-        };
+            const fetchOptions = {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+                body: formDataJsonString,
+            };
 
-        const response = await fetch(
-            "http://127.0.0.1:5001/monkey-bloging-17bb9/us-central1/app/users/create",
-            fetchOptions
-        );
+            const response = await fetch(
+                "http://127.0.0.1:5001/monkey-bloging-17bb9/us-central1/app/users/create",
+                fetchOptions
+            );
 
-        if (!response.ok) {
-            const errorMessage = await response.text();
-            throw new Error(errorMessage);
+            if (!response.ok) {
+                const errorMessage = await response.text();
+                throw new Error(errorMessage);
+            }
+
+            updateProfile(auth.currentUser, {
+                displayName: values.fullname,
+                photoURL:
+                    "https://tse4.mm.bing.net/th?id=OIP.fpaUV35ECaGkz-YNCrBSwQHaHa&pid=Api&P=0",
+            });
+            // const colRef = collection(db, "users");
+            // create users in doc có id là id của user in authentication firebase
+            // await setDoc(doc(db, "users", auth.currentUser.uid), {
+            //     fullname: values.fullname,
+            //     email: values.email,
+            //     password: values.password,
+            //     username: slugify(values.fullname, { lower: true }),
+            //     avatar: "https://tse4.mm.bing.net/th?id=OIP.fpaUV35ECaGkz-YNCrBSwQHaHa&pid=Api&P=0",
+            //     status: userStatus.ACTIVE,
+            //     role: userRole.USER,
+            //     createdAt: serverTimestamp(),
+            // });
+            // await setDoc(colRef, {
+            //     fullname: values.fullname,
+            //     email: values.email,
+            //     password: values.password,
+            // });
+            toast.success("Register successfully");
+            reset({
+                fullname: "",
+                email: "",
+                password: "",
+                username: "",
+                avatar: "",
+                status: "",
+                role: "",
+                createdAt: "",
+            });
+            navigate("/");
+        } catch (error) {
+            toast.error("Email already exists");
         }
-
-        updateProfile(auth.currentUser, {
-            displayName: values.fullname,
-            photoURL:
-                "https://tse4.mm.bing.net/th?id=OIP.fpaUV35ECaGkz-YNCrBSwQHaHa&pid=Api&P=0",
-        });
-        // const colRef = collection(db, "users");
-        // create users in doc có id là id của user in authentication firebase
-        // await setDoc(doc(db, "users", auth.currentUser.uid), {
-        //     fullname: values.fullname,
-        //     email: values.email,
-        //     password: values.password,
-        //     username: slugify(values.fullname, { lower: true }),
-        //     avatar: "https://tse4.mm.bing.net/th?id=OIP.fpaUV35ECaGkz-YNCrBSwQHaHa&pid=Api&P=0",
-        //     status: userStatus.ACTIVE,
-        //     role: userRole.USER,
-        //     createdAt: serverTimestamp(),
-        // });
-        // await setDoc(colRef, {
-        //     fullname: values.fullname,
-        //     email: values.email,
-        //     password: values.password,
-        // });
-        toast.success("Register successfully");
-        reset({
-            fullname: "",
-            email: "",
-            password: "",
-            username: "",
-            avatar: "",
-            status: "",
-            role: "",
-            createdAt: "",
-        });
-        navigate("/");
     };
     useEffect(() => {
         const arrError = Object.values(errors);

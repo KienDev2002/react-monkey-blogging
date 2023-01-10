@@ -38,8 +38,16 @@ const SignInPage = () => {
 
     const hanleSignIn = async (values) => {
         if (!isValid) return;
-        await signInWithEmailAndPassword(auth, values.email, values.password);
-        navigate("/");
+        try {
+            await signInWithEmailAndPassword(
+                auth,
+                values.email,
+                values.password
+            );
+            navigate("/");
+        } catch (error) {
+            toast.error("Account does not exist!");
+        }
     };
     useEffect(() => {
         const arrError = Object.values(errors);
